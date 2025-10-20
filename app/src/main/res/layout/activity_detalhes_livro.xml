@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".DetalhesLivroActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Título da página -->
+        <TextView
+            android:id="@+id/tvTituloPagina"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Detalhes do Livro"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:paddingBottom="16dp" />
+
+        <!-- Seção de imagem e informações básicas -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/ivCapaLivro"
+                android:layout_width="100dp"
+                android:layout_height="140dp"
+                android:layout_marginEnd="12dp"
+                android:background="#E0E0E0"
+                android:contentDescription="Capa do Livro" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvTituloLivro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Título: A Culpa é das Estrelas"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="6dp" />
+
+                <TextView
+                    android:id="@+id/tvAutorLivro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Autor: John Green"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Seção de Sinopse -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sinopse"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingTop="16dp"
+            android:paddingBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tvSinopse"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hazel foi diagnosticada com câncer aos treze anos e agora, aos dezesseis, sobrevive graças a um remédio revolucionário que detém a metástase em seus pulmões."
+            android:textSize="14sp"
+            android:lineSpacingExtra="4dp"
+            android:textColor="#333333" />
+
+        <!-- Seção de Avaliações -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Avaliações"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingTop="20dp"
+            android:paddingBottom="8dp" />
+
+        <!-- Avaliação 1 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="space_between"
+            android:paddingBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:text="Qualidade do Livro"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="4dp" />
+
+                <RatingBar
+                    android:id="@+id/rbQualidade"
+                    style="?android:attr/ratingBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:numStars="5"
+                    android:rating="4.5"
+                    android:stepSize="0.5"
+                    android:isIndicator="true" />
+            </LinearLayout>
+
+            <TextView
+                android:text="4.5/5"
+                android:textSize="14sp"
+                android:layout_gravity="center_vertical" />
+        </LinearLayout>
+
+        <!-- Avaliação 2 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="space_between"
+            android:paddingBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:text="Qualidade Física do Livro"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="4dp" />
+
+                <RatingBar
+                    android:id="@+id/rbFisico"
+                    style="?android:attr/ratingBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:numStars="5"
+                    android:rating="4.5"
+                    android:stepSize="0.5"
+                    android:isIndicator="true" />
+            </LinearLayout>
+
+            <TextView
+                android:text="4.5/5"
+                android:textSize="14sp"
+                android:layout_gravity="center_vertical" />
+        </LinearLayout>
+
+        <!-- Botão -->
+        <Button
+            android:id="@+id/btnSolicitar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Solicitar Aluguel"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:backgroundTint="#007AFF"
+            android:textColor="#FFFFFF"
+            android:padding="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp" />
+
+    </LinearLayout>
+
+
+</ScrollView>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:padding="24dp"
+    android:gravity="center_horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Título da tela -->
+    <TextView
+        android:text="Requisição de Aluguel"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_marginBottom="24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <!-- Card do livro -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@drawable/border_box"
+        android:layout_marginBottom="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/livroImagem"
+            android:src="@drawable/ic_livro_placeholder"
+            android:layout_width="60dp"
+            android:layout_height="80dp"
+            android:layout_marginEnd="16dp" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:text="Título: A Culpa é das Estrelas"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:text="Autor: John Green"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:text="Período: 7 dias"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Mensagem principal -->
+    <TextView
+        android:text="Sua Solicitação foi enviada para análise do administrador!"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Mensagem secundária -->
+    <TextView
+        android:text="Você será notificado quando o administrador responder sua notificação"
+        android:textAlignment="center"
+        android:textColor="@color/gray"
+        android:layout_marginBottom="32dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Botão OK -->
+    <Button
+        android:id="@+id/btnOk"
+        android:text="OK"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/purple_500"
+        android:textColor="@color/white"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

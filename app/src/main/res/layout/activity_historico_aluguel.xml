@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HistoricoAluguelActivity">
+
+    <!-- Título -->
+    <TextView
+        android:text="Histórico de Aluguel"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Linha separadora -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Conteúdo principal -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="16dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Card 1 -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:background="@drawable/bg_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/ic_book_placeholder"
+                    android:contentDescription="Capa do livro" />
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="Título: A Culpa é das Estrelas"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:text="Autor: John Green"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:layout_marginTop="2dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:text="Alugado: 10/04/2025"
+                        android:textColor="@color/gray"
+                        android:textSize="13sp"
+                        android:layout_marginTop="6dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:text="Devolvido: 17/04/2025"
+                        android:textColor="@color/gray"
+                        android:textSize="13sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Card 2 -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:background="@drawable/bg_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/ic_book_placeholder"
+                    android:contentDescription="Capa do livro" />
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="Título: Duna"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:text="Autor: Frank Herbert"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:layout_marginTop="2dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:text="Alugado: 15/08/2025"
+                        android:textColor="@color/gray"
+                        android:textSize="13sp"
+                        android:layout_marginTop="6dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:text="Devolvido: 21/08/2025"
+                        android:textColor="@color/gray"
+                        android:textSize="13sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Barra inferior -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingVertical="8dp"
+        android:background="@color/white"
+        android:elevation="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:src="@drawable/ic_home"
+                android:layout_width="24dp"
+                android:layout_height="24dp" />
+            <TextView
+                android:text="Início"
+                android:textSize="12sp"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:src="@drawable/ic_book"
+                android:layout_width="24dp"
+                android:layout_height="24dp" />
+            <TextView
+                android:text="Meus Aluguéis"
+                android:textSize="12sp"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:src="@drawable/ic_person"
+                android:layout_width="24dp"
+                android:layout_height="24dp" />
+            <TextView
+                android:text="Perfil"
+                android:textSize="12sp"
+                android:textColor="@color/black" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
