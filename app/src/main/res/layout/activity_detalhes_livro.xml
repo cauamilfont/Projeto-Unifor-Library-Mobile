@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#FFFFFF"
-    tools:context=".DetalhesLivroActivity">
+    tools:context=".BookDetailsActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -95,7 +96,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="space_between"
+            android:gravity="center_vertical"
             android:paddingBottom="8dp">
 
             <LinearLayout
@@ -108,7 +109,9 @@
                     android:text="Qualidade do Livro"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    android:paddingBottom="4dp" />
+                    android:paddingBottom="4dp"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"/>
 
                 <RatingBar
                     android:id="@+id/rbQualidade"
@@ -124,7 +127,9 @@
             <TextView
                 android:text="4.5/5"
                 android:textSize="14sp"
-                android:layout_gravity="center_vertical" />
+                android:layout_gravity="center_vertical"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" />
         </LinearLayout>
 
         <!-- Avaliação 2 -->
@@ -132,7 +137,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="space_between"
+            android:gravity="center_vertical"
             android:paddingBottom="16dp">
 
             <LinearLayout
@@ -145,7 +150,9 @@
                     android:text="Qualidade Física do Livro"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    android:paddingBottom="4dp" />
+                    android:paddingBottom="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
                 <RatingBar
                     android:id="@+id/rbFisico"
@@ -161,12 +168,14 @@
             <TextView
                 android:text="4.5/5"
                 android:textSize="14sp"
-                android:layout_gravity="center_vertical" />
+                android:layout_gravity="center_vertical"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" />
         </LinearLayout>
 
         <!-- Botão -->
         <Button
-            android:id="@+id/btnSolicitar"
+            android:id="@+id/btnRequest"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Solicitar Aluguel"
@@ -178,7 +187,23 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="16dp" />
 
+
+
     </LinearLayout>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        style="@style/Widget.Material3.BottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#F7F2FA"
+        app:itemActiveIndicatorStyle="@style/App.Custom.Indicator"
+        app:itemIconTint="@color/bottom_nav_item_color_selector"
+        app:itemTextColor="@color/bottom_nav_item_color_selector"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu" />
 
 
-</ScrollView>
+
+
+</RelativeLayout>

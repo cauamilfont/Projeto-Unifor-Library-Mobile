@@ -150,62 +150,15 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Barra inferior -->
-    <LinearLayout
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingVertical="8dp"
-        android:background="@color/white"
-        android:elevation="8dp"
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        style="@style/Widget.Material3.BottomNavigationView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:src="@drawable/ic_home"
-                android:layout_width="24dp"
-                android:layout_height="24dp" />
-            <TextView
-                android:text="Início"
-                android:textSize="12sp"
-                android:textColor="@color/black" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:src="@drawable/ic_book"
-                android:layout_width="24dp"
-                android:layout_height="24dp" />
-            <TextView
-                android:text="Meus Aluguéis"
-                android:textSize="12sp"
-                android:textColor="@color/black" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:src="@drawable/ic_person"
-                android:layout_width="24dp"
-                android:layout_height="24dp" />
-            <TextView
-                android:text="Perfil"
-                android:textSize="12sp"
-                android:textColor="@color/black" />
-        </LinearLayout>
-    </LinearLayout>
+        android:layout_height="wrap_content"
+        android:background="#F7F2FA"
+        app:itemActiveIndicatorStyle="@style/App.Custom.Indicator"
+        app:itemIconTint="@color/bottom_nav_item_color_selector"
+        app:itemTextColor="@color/bottom_nav_item_color_selector"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu" />
 </LinearLayout>

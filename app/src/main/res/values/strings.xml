@@ -1,3 +1,18 @@
 <resources>
-    <string name="app_name">Telas Livros</string>
+    <string name="app_name">My Application</string>
+    <string name="title_alterar_senha">Alterar Senha</string>
+    <string name="hint_senha_atual">Senha Atual</string>
+    <string name="hint_nova_senha">Nova Senha</string>
+    <string name="hint_confirmar_nova_senha">Confirmar Nova Senha</string>
+    <string name="btn_salvar">Salvar</string>
+    <string name="cd_voltar">Voltar</string>
+    <string name="title_editar_perfil">Editar Perfil</string>
+    <string name="cd_foto_perfil">Foto do Perfil</string>
+    <string name="cd_mudar_foto">Mudar foto de perfil</string>
+    <string name="hint_nome">Nome</string>
+    <string name="hint_telefone">Telefone</string>
+    <string name="hint_cpf">CPF</string>
+    <string name="hint_cep">CEP</string>
+    <string name="btn_salvar_alteracoes">Salvar Alterações</string>
+    <string name="chat">Chat</string>
 </resources>
