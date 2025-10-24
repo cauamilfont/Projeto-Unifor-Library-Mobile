@@ -160,5 +160,5 @@
         app:itemIconTint="@color/bottom_nav_item_color_selector"
         app:itemTextColor="@color/bottom_nav_item_color_selector"
         app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_nav_menu" />
+         />
 </LinearLayout>

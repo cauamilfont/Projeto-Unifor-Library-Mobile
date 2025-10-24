@@ -3,21 +3,31 @@ package com.example.telaslivros
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class ExploreBooksActivity : BaseActivity() {
 
     override fun getBottomNavItemId() = R.id.navigation_inicio;
 
+    private lateinit var recyclerView : RecyclerView
+    private lateinit var adapter : ExploreBooksAdapter
     lateinit var chatButton : FloatingActionButton
-    lateinit var book : ImageView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_explorar_livros)
         chatButton = findViewById(R.id.fab_chat)
-        book = findViewById(R.id.book)
+        recyclerView = findViewById(R.id.recyclerViewBooks)
+        val mockData = createMockData()
+        adapter = ExploreBooksAdapter(mockData)
+
+        recyclerView.layoutManager = GridLayoutManager(this, 3)
+        recyclerView.adapter = adapter
+
 
         setupBottomNavigation()
     }
@@ -28,9 +38,51 @@ class ExploreBooksActivity : BaseActivity() {
         val intent = Intent(this, ChatBotActivity::class.java)
         startActivity(intent)
         }
-        book.setOnClickListener {
-            val intent = Intent(this, BookDetailsActivity::class.java)
-            startActivity(intent)
-        }
+
+    }
+
+    private fun createMockData() : MutableList<Book>{
+        return mutableListOf(
+            Book(
+                title = "A Culpa é das Estrelas",
+                author = "John Green",
+                imageURL = "https://m.media-amazon.com/images/I/811ivBP1rsL._UF1000,1000_QL80_.jpg",
+                synopsis = "Hazel Grace Lancaster, uma paciente com câncer de 16 anos, conhece e se apaixona por Gus Waters, um adolescente com uma perna amputada.",
+                bookQuality = 4.7,
+                physicalQuality = 4.5
+            ),
+            Book(
+                title = "O Pequeno Príncipe",
+                author = "Antoine de Saint-Exupéry",
+                imageURL = "https://m.media-amazon.com/images/I/81TmOZIXvzL._UF1000,1000_QL80_.jpg",
+                synopsis = "Um piloto cai no deserto do Saara e conhece um jovem príncipe que viajou de seu próprio asteróide.",
+                bookQuality = 4.9,
+                physicalQuality = 4.8
+            ),
+            Book(
+                title = "Duna",
+                author = "Frank Herbert",
+                imageURL = "https://m.media-amazon.com/images/I/81zN7udGRUL.jpg",
+                synopsis = "Uma saga de ficção científica sobre a luta pelo controle do planeta deserto Arrakis, a única fonte da especiaria 'melange'.",
+                bookQuality = 4.8,
+                physicalQuality = 4.6
+            ),
+            Book(
+                title = "1984",
+                author = "George Orwell",
+                imageURL = "https://m.media-amazon.com/images/I/61t0bwt1s3L._AC_UF1000,1000_QL80_.jpg",
+                synopsis = "Em um futuro distópico, a sociedade é controlada pelo Partido e seu líder onipresente, o Grande Irmão.",
+                bookQuality = 4.9,
+                physicalQuality =null
+            ),
+            Book(
+                title = "Harry Potter e a Pedra Filosofal",
+                author = "J.K. Rowling",
+                imageURL = "https://m.media-amazon.com/images/I/61jgm6ooXzL._AC_UF1000,1000_QL80_.jpg",
+                synopsis = "Um jovem órfão descobre que é um bruxo e é convidado a estudar na Escola de Magia e Bruxaria de Hogwarts.",
+                bookQuality = 4.9,
+                physicalQuality = 4.7
+            )
+        )
     }
 }

@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.telaslivros">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
         <activity
-            android:name=".ExploreBooksActivity"
+            android:name=".MainActivity"
             android:exported="true">
 
 
@@ -42,14 +44,43 @@
             android:name=".EditProfileActivity"
             android:exported="false" />
         <activity
-            android:name="com.example.telaslivros.ChatBotActivity"
+            android:name=".ChatBotActivity"
             android:exported="false" />
         <activity
             android:name=".RentRequestActivity"
             android:exported="false" />
         <activity
-            android:name="com.example.telaslivros.BookDetailsActivity"
+            android:name=".BookDetailsActivity"
             android:exported="false" />
+        <activity
+            android:name=".ExploreBooksActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PerfilActivityAdmin"
+            android:exported="false" />
+        <activity
+            android:name=".NewPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RecoveryPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RecoveryPasswordCodeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".NotificacaoAdminActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ModerationActivity"
+            android:exported="false" />
+
+
 
     </application>
 
