@@ -15,10 +15,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
-            android:src="@drawable/ic_arrow_back"
+        <ImageButton
+            android:id="@+id/backBtn"
             android:layout_width="24dp"
-            android:layout_height="24dp" />
+            android:layout_height="24dp"
+            android:src="@drawable/ic_arrow_back" />
 
         <TextView
             android:layout_marginStart="16dp"

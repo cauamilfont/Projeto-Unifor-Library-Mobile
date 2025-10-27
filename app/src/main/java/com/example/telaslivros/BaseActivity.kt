@@ -1,6 +1,7 @@
 package com.example.telaslivros
 
 import android.content.Intent
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -15,14 +16,14 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        // Verifica se a bottomNav foi inicializada antes de usá-la
+
         if (::bottomNav.isInitialized) {
             val itemId = getBottomNavItemId()
             if (itemId != 0) {
                 val menuItem = bottomNav.menu.findItem(itemId)
                 menuItem?.isChecked = true
             } else {
-                // Remove a seleção se for uma tela secundária
+
                 bottomNav.menu.setGroupCheckable(0, true, false)
                 for (i in 0 until bottomNav.menu.size) {
                     bottomNav.menu[i].isChecked = false
@@ -35,19 +36,26 @@ abstract class BaseActivity : AppCompatActivity() {
     protected fun setupBottomNavigation() {
         bottomNav = findViewById(R.id.bottom_navigation)
 
-        // 2. Lê o papel (role) do SharedPreferences
+        val backButton = findViewById<ImageButton?>(R.id.backButton)
+
+
+        backButton?.setOnClickListener {
+            finish()
+        }
+
+
         val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
         val userRole = sharedPrefs.getString("EMAIL", "user") ?: "user"
 
-        // 3. Limpa qualquer menu antigo e infla o menu correto
+
         bottomNav.menu.clear()
 
         if (userRole.equals("admin", ignoreCase = true)) {
-            // Se for ADMIN
+
             bottomNav.inflateMenu(R.menu.bottom_nav_menu_admin)
             setupAdminNavigation()
         } else {
-            // Se for USER (padrão)
+
             bottomNav.inflateMenu(R.menu.bottom_nav_menu)
             setupUserNavigation()
         }
@@ -84,12 +92,12 @@ abstract class BaseActivity : AppCompatActivity() {
                         suppressTransition()
                     }
                     R.id.navigation_admin_dashboard -> {
-                        // (Crie esta Activity quando precisar)
-                        // startActivity(Intent(this, DashboardActivity::class.java))
+
+                        startActivity(Intent(this, AdminPanelActivity::class.java))
                         suppressTransition()
                     }
                     R.id.navigation_perfil -> {
-                        // A tela de perfil é compartilhada!
+
                         startActivity(Intent(this, PerfilActivityAdmin::class.java))
                         suppressTransition()
                     }

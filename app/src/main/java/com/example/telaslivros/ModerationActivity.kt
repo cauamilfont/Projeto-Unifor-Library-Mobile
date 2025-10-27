@@ -14,14 +14,14 @@ class ModerationActivity : BaseActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ModerationAdapter
 
-    lateinit var backButton : ImageView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_moderacao)
 
-        backButton = findViewById(R.id.backButton)
+
 
         setupBottomNavigation()
 
@@ -38,10 +38,7 @@ class ModerationActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-        backButton.setOnClickListener {
-            finish()
 
-    }
 }
 
     private fun createMockData(): MutableList<Comment> {

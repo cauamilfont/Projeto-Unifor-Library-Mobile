@@ -39,4 +39,13 @@
     <string name="descricao_codigo">Informe o código recebido no e-mail</string>
     <string name="reenviar_codigo">Reenviar código</string>
     <string name="continuar">Continuar</string>
+    <string name="title_retirada_livro">Retirada do Livro</string>
+    <string name="instructions_retirada">Apresente este código na biblioteca para retirar seu livro</string>
+    <string name="cd_codigo_barras">Código de barras para retirada do livro</string>
+    <string name="title_deixar_avaliacao">Deixar uma Avaliação</string>
+    <string name="label_qualidade_livro">Qualidade do livro</string>
+    <string name="label_qualidade_fisica">Qualidade física do livro</string>
+    <string name="hint_comentario">Escreva seu comentário…</string>
+    <string name="btn_enviar_avaliacao">Enviar avaliação</string>
+
 </resources>

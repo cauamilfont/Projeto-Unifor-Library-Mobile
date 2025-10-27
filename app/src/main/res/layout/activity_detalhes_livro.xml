@@ -13,16 +13,37 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+
+
         <!-- Título da página -->
-        <TextView
-            android:id="@+id/tvTituloPagina"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Detalhes do Livro"
-            android:textAlignment="center"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:paddingBottom="16dp" />
+            android:paddingBottom="16dp">
+
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_arrow_back"
+                android:contentDescription="@string/cd_voltar"
+                android:padding="12dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="?attr/colorOnSurface"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:id="@+id/tvTituloPagina"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Detalhes do Livro"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface"/>
+
+        </RelativeLayout>
 
         <!-- Seção de imagem e informações básicas -->
         <LinearLayout
@@ -48,10 +69,10 @@
                     android:id="@+id/tvTituloLivro"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingBottom="6dp"
                     android:text="Título: A Culpa é das Estrelas"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:paddingBottom="6dp" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvAutorLivro"
@@ -125,11 +146,12 @@
             </LinearLayout>
 
             <TextView
-                android:text="4.5/5"
-                android:textSize="14sp"
-                android:layout_gravity="center_vertical"
+                android:id="@+id/tvBookQuality"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_width="wrap_content" />
+                android:layout_gravity="center_vertical"
+                android:text="4.5/5"
+                android:textSize="14sp" />
         </LinearLayout>
 
         <!-- Avaliação 2 -->
@@ -166,11 +188,12 @@
             </LinearLayout>
 
             <TextView
-                android:text="4.5/5"
-                android:textSize="14sp"
-                android:layout_gravity="center_vertical"
+                android:id="@+id/tvPhysicalQuality"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_width="wrap_content" />
+                android:layout_gravity="center_vertical"
+                android:text="4.5/5"
+                android:textSize="14sp" />
         </LinearLayout>
 
         <!-- Botão -->

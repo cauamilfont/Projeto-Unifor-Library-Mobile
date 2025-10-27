@@ -19,14 +19,17 @@
             android:paddingVertical="16dp"
             android:paddingHorizontal="12dp">
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/backButton"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_arrow_back"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/cd_voltar"
-                app:tint="@android:color/black" />
+                android:padding="12dp"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="?attr/colorOnSurface" />
 
             <TextView
                 android:id="@+id/textViewTitle"

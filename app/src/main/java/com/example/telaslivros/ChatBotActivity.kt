@@ -24,8 +24,7 @@ class ChatBotActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
         btnBack.setOnClickListener {
-            val intent = Intent(this, ExploreBooksActivity::class.java)
-            startActivity(intent)
+            finish()
         }
     }
 }

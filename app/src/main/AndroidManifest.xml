@@ -79,6 +79,31 @@
         <activity
             android:name=".ModerationActivity"
             android:exported="false" />
+        <activity
+            android:name=".RemovalActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminPanelActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddBooksActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DetailsRequestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditBooksActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ManageBooksActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ManageRequestsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ReviewActivity"
+            android:exported="false" />
+
 
 
 

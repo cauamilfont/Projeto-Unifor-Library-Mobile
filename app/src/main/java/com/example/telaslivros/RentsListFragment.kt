@@ -7,19 +7,20 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.time.LocalDate
 
 class RentsListFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var rentsAdapter: RentsAdapter
 
-    // Variável para guardar o tipo de lista que este fragmento deve mostrar
+
     private var listType: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 1. Lemos o argumento que o PagerAdapter nos enviou
+
         arguments?.let {
             listType = it.getString(ARG_LIST_TYPE)
         }
@@ -35,7 +36,7 @@ class RentsListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 2. Usamos o 'listType' para pegar os dados filtrados
+
         val mockData = criarComentariosMock(listType)
 
         recyclerView = view.findViewById(R.id.recyclerViewRents)
@@ -44,24 +45,26 @@ class RentsListFragment : Fragment() {
         recyclerView.adapter = rentsAdapter
     }
 
-    // 3. ATUALIZAMOS A FUNÇÃO DE MOCK
-    // Agora ela tem uma "base de dados" maior e filtra
-    // de acordo com o tipo solicitado.
+
     private fun criarComentariosMock(tipo: String?): List<Rent> {
         val todosOsAlugueis = listOf(
-            Rent("A Culpa é das Estrelas", "John Green", "Pendente"),
-            Rent("O Pequeno Príncipe", "Antoine de Saint-Exupéry", "Pendente"),
-            Rent("Duna", "Frank Herbert", "Aprovado"),
-            Rent("O Senhor dos Anéis", "J.R.R. Tolkien", "Aprovado"),
-            Rent("1984", "George Orwell", "Histórico"),
-            Rent("Cem Anos de Solidão", "Gabriel García Márquez", "Histórico")
+            Rent("A Culpa é das Estrelas", "John Green", "João Luiz","Pendente", "https://m.media-amazon.com/images/I/811ivBP1rsL._UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 26),
+                LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) ),
+            Rent("O Pequeno Príncipe", "Antoine de Saint-Exupéry", "João Luiz", "Pendente", "https://m.media-amazon.com/images/I/81TmOZIXvzL._UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 26),
+                LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) ),
+            Rent("Duna", "Frank Herbert", "João Luiz","Aprovado", "https://m.media-amazon.com/images/I/81zN7udGRUL.jpg", LocalDate.of(2025, 10, 26),
+                LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) ),
+            Rent("O Senhor dos Anéis", "J.R.R. Tolkien", "João Luiz","Aprovado", "https://m.media-amazon.com/images/I/71ZLavBjpRL._AC_UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 26),
+                LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) ),
+            Rent("1984", "George Orwell", "João Luiz","Histórico", "https://m.media-amazon.com/images/I/61t0bwt1s3L._AC_UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 26),
+                LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) ),
+            Rent("Harry Potter e a Pedra Filosofal", "J.K. Rowling", "João Luiz","Histórico", "https://m.media-amazon.com/images/I/61jgm6ooXzL._AC_UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 26),
+                LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) )
         )
 
         // Se o tipo for nulo, retorna uma lista vazia
         if (tipo == null) return emptyList()
 
-        // Filtra a lista principal com base no status
-        // (Exatamente como você faria no banco de dados com "WHERE status = ...")
         return when (tipo) {
             "PENDENTE" -> todosOsAlugueis.filter { it.status == "Pendente" }
             "APROVADO" -> todosOsAlugueis.filter { it.status == "Aprovado" }

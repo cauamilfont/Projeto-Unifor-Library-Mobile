@@ -1,0 +1,19 @@
+package com.example.telaslivros
+
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.viewpager2.adapter.FragmentStateAdapter
+
+class RequestsPagerAdapter (activity: FragmentActivity) : FragmentStateAdapter(activity) {
+
+    override fun getItemCount(): Int = 3 // Pendentes, Aprovados, Recusados
+
+    override fun createFragment(position: Int): Fragment {
+        return when (position) {
+            0 -> RequestsFragment.newInstance("Pendente")
+            1 -> RequestsFragment.newInstance("Aprovado")
+            2 -> RequestsFragment.newInstance("Recusado")
+            else -> throw IllegalStateException("Posição inválida")
+        }
+    }
+}

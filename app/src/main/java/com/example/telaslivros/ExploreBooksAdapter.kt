@@ -16,6 +16,7 @@ class ExploreBooksAdapter(private val bookList : MutableList<Book>) :
 
     class ExploreBookViewHolder(view : View) : RecyclerView.ViewHolder(view){
         val title : TextView = view.findViewById(R.id.tvBookTitle)
+
         val cover : ImageView = view.findViewById(R.id.ivBookCover)
 
     }
@@ -31,7 +32,15 @@ class ExploreBooksAdapter(private val bookList : MutableList<Book>) :
     override fun onBindViewHolder(holder: ExploreBookViewHolder, position: Int) {
         val books = bookList[position]
 
-        holder.title.text = "Livro: ${books.title}"
+        val bookTitle: String = books.title
+        val urlImage : String = books.imageURL
+        val author : String = books.author
+        val synopsys : String = books.synopsis
+        val bookQuality : Float = books.bookQuality
+        val physicalQuality : Float = books.physicalQuality
+
+
+        holder.title.text = "Livro: $bookTitle"
 
         Glide.with(holder.itemView.context)
             .load(books.imageURL)
@@ -42,6 +51,12 @@ class ExploreBooksAdapter(private val bookList : MutableList<Book>) :
         holder.itemView.setOnClickListener {
             val context = holder.itemView.context
             val intent = Intent(context, BookDetailsActivity::class.java)
+            intent.putExtra("TITLE", bookTitle)
+            intent.putExtra("URL_IMAGE", urlImage)
+            intent.putExtra("AUTHOR", author)
+            intent.putExtra("SYNOPSYS", synopsys)
+            intent.putExtra("BOOK_QUALITY", bookQuality)
+            intent.putExtra("PHYSICAL_QUALITY", physicalQuality)
             context.startActivity(intent)
         }
 

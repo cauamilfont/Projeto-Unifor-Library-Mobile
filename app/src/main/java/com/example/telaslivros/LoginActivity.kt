@@ -42,7 +42,7 @@ class LoginActivity : AppCompatActivity() {
             }
 
             val intent = if(email.text.toString().equals("admin", ignoreCase = true))
-                Intent(this, PerfilActivityAdmin::class.java )
+                Intent(this, AdminPanelActivity::class.java )
             else
                 Intent(this, ExploreBooksActivity::class.java)
 
@@ -56,6 +56,10 @@ class LoginActivity : AppCompatActivity() {
 
         register.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
+        }
+        backButton.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
     }

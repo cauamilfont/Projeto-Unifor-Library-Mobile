@@ -20,4 +20,7 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="RatingBar" parent="Theme.AppCompat">
+        <item name="colorControlNormal">@android:color/darker_gray</item> <item name="colorControlActivated">#FFC107</item> </style>
+
 </resources>

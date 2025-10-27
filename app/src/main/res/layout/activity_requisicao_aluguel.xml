@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content">
 
                 <ImageView
-                    android:id="@+id/livroImagem"
+                    android:id="@+id/ivImage"
                     android:src="@drawable/ic_book_placeholder"
                     android:layout_width="60dp"
                     android:layout_height="80dp"
@@ -45,20 +45,22 @@
                     android:layout_height="wrap_content">
 
                     <TextView
+                        android:id="@+id/tvTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="Título: A Culpa é das Estrelas"
                         android:textColor="@color/black"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="4dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
+                        android:textSize="14sp" />
 
                     <TextView
+                        android:id="@+id/tvAuthor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="Autor: John Green"
                         android:textColor="@color/black"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="4dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
+                        android:textSize="14sp" />
 
                     <TextView
                         android:text="Período: 7 dias"
