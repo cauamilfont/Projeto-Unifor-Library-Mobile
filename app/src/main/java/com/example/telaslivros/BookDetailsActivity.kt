@@ -1,5 +1,6 @@
 package com.example.telaslivros
 
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -7,6 +8,10 @@ import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import com.google.android.material.textfield.TextInputEditText
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
 
 
 class BookDetailsActivity : BaseActivity() {
@@ -22,6 +27,8 @@ class BookDetailsActivity : BaseActivity() {
     lateinit var physicalRB : RatingBar
     lateinit var cover : ImageView
     lateinit var btnBack : ImageView
+    lateinit var etInitialDate : TextInputEditText
+    lateinit var etFinalDate : TextInputEditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +44,8 @@ class BookDetailsActivity : BaseActivity() {
         physicalRB = findViewById(R.id.rbFisico)
         cover = findViewById(R.id.ivCapaLivro)
         btnBack = findViewById(R.id.backButton)
+        etInitialDate = findViewById(R.id.etDataInicial)
+        etFinalDate = findViewById(R.id.etDataFinal)
 
         setupBottomNavigation()
     }
@@ -68,5 +77,39 @@ class BookDetailsActivity : BaseActivity() {
         btnBack.setOnClickListener {
             finish()
         }
+        
+        etInitialDate.setOnClickListener {
+            showDatePickerDialog(it as TextInputEditText)
+        }
+        etFinalDate.setOnClickListener {
+            showDatePickerDialog(it as TextInputEditText)
+        }
+    }
+
+    private fun showDatePickerDialog(editText: TextInputEditText) {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+
+        val datePickerDialog = DatePickerDialog(
+            this,
+            { view, selectedYear, selectedMonth, selectedDayOfMonth ->
+                val selectedDate = LocalDate.of(selectedYear, selectedMonth + 1, selectedDayOfMonth)
+
+                val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                editText.setText(selectedDate.format(formatter))
+            },
+            year,
+            month,
+            day
+        )
+
+
+        datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
+
+
+        datePickerDialog.show()
     }
 }

@@ -7,9 +7,9 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
 
-class MyRentsActivity : BaseActivity() { // <--- Mude aqui se necessário
+class MyRentsActivity : BaseActivity() {
 
-    // Se estiver usando BaseActivity, adicione esta linha
+
     override fun getBottomNavItemId() = R.id.navigation_alugueis
 
     lateinit var backBtn : ImageButton
@@ -29,7 +29,7 @@ class MyRentsActivity : BaseActivity() { // <--- Mude aqui se necessário
         val adapter = RentsPagerAdapter(this)
         viewPager.adapter = adapter
 
-        // 4. Conecta as abas ao ViewPager e define os títulos
+
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> "Em Análise"
@@ -39,7 +39,6 @@ class MyRentsActivity : BaseActivity() { // <--- Mude aqui se necessário
             }
         }.attach()
 
-        // 5. Liga sua barra de navegação inferior (se estiver usando BaseActivity)
         setupBottomNavigation()
     }
 

@@ -14,7 +14,7 @@ class NotificacaoActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_notificacao_admin)
+        setContentView(R.layout.activity_notificacao_user)
         saveButton = findViewById(R.id.buttonSave)
 
         setupBottomNavigation()

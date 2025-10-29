@@ -43,15 +43,15 @@ class RequestsFragment : Fragment() {
         val todasSolicitacoes = listOf(
             Rent("A Culpa é das Estrelas", "John Green", "João Luiz","Pendente", "https://m.media-amazon.com/images/I/811ivBP1rsL._UF1000,1000_QL80_.jpg",LocalDate.of(2025, 10, 26),
                 LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) ),
-            Rent("O Pequeno Príncipe", "Antoine de Saint-Exupéry", "João Luiz", "Pendente", "https://m.media-amazon.com/images/I/81TmOZIXvzL._UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 22),
+            Rent("O Pequeno Príncipe", "Antoine de Saint-Exupéry", "Pedro", "Pendente", "https://m.media-amazon.com/images/I/81TmOZIXvzL._UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 22),
             LocalDate.of(2025, 10, 29), LocalDate.of(2025, 11, 8) ),
-            Rent("Duna", "Frank Herbert", "João Luiz","Aprovado", "https://m.media-amazon.com/images/I/81zN7udGRUL.jpg", LocalDate.of(2025, 10, 26),
+            Rent("Duna", "Frank Herbert", "Ana","Aprovado", "https://m.media-amazon.com/images/I/81zN7udGRUL.jpg", LocalDate.of(2025, 10, 26),
                 LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) ),
-            Rent("O Senhor dos Anéis", "J.R.R. Tolkien", "João Luiz","Aprovado", "https://m.media-amazon.com/images/I/71ZLavBjpRL._AC_UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 26),
+            Rent("O Senhor dos Anéis", "J.R.R. Tolkien", "Maria","Aprovado", "https://m.media-amazon.com/images/I/71ZLavBjpRL._AC_UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 26),
                 LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) ),
-            Rent("1984", "George Orwell", "João Luiz","Recusado", "https://m.media-amazon.com/images/I/61t0bwt1s3L._AC_UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 26),
+            Rent("1984", "George Orwell", "Luiz","Recusado", "https://m.media-amazon.com/images/I/61t0bwt1s3L._AC_UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 26),
                 LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) ),
-            Rent("Harry Potter e a Pedra Filosofal", "J.K. Rowling", "João Luiz","Recusado", "https://m.media-amazon.com/images/I/61jgm6ooXzL._AC_UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 26),
+            Rent("Harry Potter e a Pedra Filosofal", "J.K. Rowling", "Antônio","Recusado", "https://m.media-amazon.com/images/I/61jgm6ooXzL._AC_UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 26),
                 LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) )
         )
         if (status == null) return emptyList()

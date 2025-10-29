@@ -22,8 +22,7 @@ class ManageRequestAdapter (private val rents: List<Rent>) :
 
     }
 
-    // 2. onCreateViewHolder (Criador de Visualizações)
-    // Chamado quando o RecyclerView precisa criar um novo "card"
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ManageRequestViewHolder {
         // Infla (cria) o layout XML do item
         val view = LayoutInflater.from(parent.context)
@@ -31,18 +30,16 @@ class ManageRequestAdapter (private val rents: List<Rent>) :
         return ManageRequestViewHolder(view)
     }
 
-    // 3. getItemCount (Contador de Itens)
-    // Diz ao RecyclerView quantos itens existem na lista
+
     override fun getItemCount() = rents.size
 
-    // 4. onBindViewHolder (Vinculador de Dados)
-    // Pega os dados de uma posição da lista e os coloca no "card"
-    override fun onBindViewHolder(holder: ManageRequestViewHolder, position: Int) {
-        val rent = rents[position] // Pega o item da lista
 
-        // Coloca os dados nos TextViews
+    override fun onBindViewHolder(holder: ManageRequestViewHolder, position: Int) {
+        val rent = rents[position]
+
+
         holder.title.text = "Título: ${rent.title}"
-        holder.user.text = "Autor: ${rent.user}"
+        holder.user.text = "Usuário: ${rent.user}"
         val status = rent.status
 
 

@@ -21,7 +21,7 @@ class RentsAdapter(private val rents: List<Rent>) :
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RentViewHolder {
-        // Infla (cria) o layout XML do item
+
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_rent_book, parent, false)
         return RentViewHolder(view)
@@ -33,7 +33,7 @@ class RentsAdapter(private val rents: List<Rent>) :
     override fun onBindViewHolder(holder: RentViewHolder, position: Int) {
         val rent = rents[position]
 
-        // Coloca os dados nos TextViews
+
         holder.title.text = "Título: ${rent.title}"
         holder.author.text = "Autor: ${rent.author}"
         holder.status.text = "Status:\n${rent.status}"
@@ -53,13 +53,7 @@ class RentsAdapter(private val rents: List<Rent>) :
                 context.startActivity(intent)
             }
         }
-        if(rent.status.equals("Histórico", ignoreCase = true )) {
-            holder.itemView.setOnClickListener {
-                val context = holder.itemView.context
-                val intent = Intent(context, ReviewActivity::class.java)
-                context.startActivity(intent)
-            }
-        }
+
 
 
     }

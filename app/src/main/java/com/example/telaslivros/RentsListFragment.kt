@@ -62,7 +62,7 @@ class RentsListFragment : Fragment() {
                 LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) )
         )
 
-        // Se o tipo for nulo, retorna uma lista vazia
+
         if (tipo == null) return emptyList()
 
         return when (tipo) {
@@ -73,8 +73,7 @@ class RentsListFragment : Fragment() {
         }
     }
 
-    // 4. ESTE É O "COMPANION OBJECT"
-    // É a "fábrica" padrão para criar fragmentos com argumentos de forma segura.
+
     companion object {
         private const val ARG_LIST_TYPE = "arg_list_type"
 
