@@ -1,5 +1,6 @@
 package com.example.telaslivros
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -18,6 +19,7 @@ class LoginActivity : AppCompatActivity() {
     lateinit var register : TextView
     lateinit var backButton : ImageButton
     lateinit var email : EditText
+    lateinit var password : EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +30,7 @@ class LoginActivity : AppCompatActivity() {
         register = findViewById(R.id.tvCadastrar)
         backButton = findViewById(R.id.backButton)
         email = findViewById(R.id.etEmailLogin)
+        password= findViewById(R.id.etSenhaLogin)
 
 
     }
@@ -35,18 +38,50 @@ class LoginActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
+        val userDatabase = getSharedPreferences("user_database", MODE_PRIVATE)
         enter.setOnClickListener {
-            val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-            sharedPrefs.edit {
-                putString("EMAIL", email.text.toString())
+
+           if(email.text.toString().isBlank() || password.text.toString().isBlank()){
+               Toast.makeText(this, "Por favor, preencha todos os campos", Toast.LENGTH_SHORT).show()
+               return@setOnClickListener
+           }
+            val login = userDatabase.getString("user_${email.text}", null)
+            var loginSuccess = false
+            var userRole = "user"
+
+            if(login != null){
+                val parts = login.split(",")
+                val savedPassword = parts[0]
+                val savedRole = parts[1]
+
+                if (password.text.toString() == savedPassword) {
+                    loginSuccess = true
+                    userRole = savedRole
+                }
             }
+            if (loginSuccess) {
 
-            val intent = if(email.text.toString().equals("admin", ignoreCase = true))
-                Intent(this, AdminPanelActivity::class.java )
-            else
-                Intent(this, ExploreBooksActivity::class.java)
+                Toast.makeText(this, "Login bem-sucedido!", Toast.LENGTH_SHORT).show()
 
-            startActivity(intent)
+                val sessionPrefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                sessionPrefs.edit {
+                    putBoolean("IS_LOGGED_IN", true)
+                    putString("USER_ROLE", userRole)
+                }
+
+                if (userRole.equals("admin", ignoreCase = true)) {
+                    val intent = Intent(this, AdminPanelActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    val intent = Intent(this, ExploreBooksActivity::class.java)
+                    startActivity(intent)
+                }
+
+                finish()
+
+            } else {
+                Toast.makeText(this, "E-mail ou senha inválidos", Toast.LENGTH_SHORT).show()
+            }
         }
 
         recoveryPassword.setOnClickListener {

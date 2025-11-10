@@ -3,6 +3,7 @@ package com.example.telaslivros
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import androidx.core.content.edit
 
 
 class PerfilActivityUser : BaseActivity() {
@@ -44,6 +45,10 @@ class PerfilActivityUser : BaseActivity() {
         }
 
         logout.setOnClickListener {
+            val sessionPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+            sessionPrefs.edit {
+                putBoolean("IS_LOGGED_IN", false)
+            }
             val intent = Intent(this, LoginActivity::class.java )
             startActivity(intent)
         }

@@ -49,11 +49,11 @@
             android:id="@+id/etEmailLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@android:drawable/editbox_background"
             android:hint="E-mail"
             android:inputType="textEmailAddress"
-            android:layout_marginBottom="16dp"
-            android:padding="12dp"
-            android:background="@android:drawable/editbox_background" />
+            android:padding="12dp" />
 
         <EditText
             android:id="@+id/etSenhaLogin"

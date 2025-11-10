@@ -3,6 +3,7 @@ package com.example.telaslivros
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import androidx.core.content.edit
 
 class PerfilActivityAdmin : BaseActivity() {
     override fun getBottomNavItemId() = R.id.navigation_perfil;
@@ -43,6 +44,10 @@ class PerfilActivityAdmin : BaseActivity() {
         }
 
         logout.setOnClickListener {
+            val sessionPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+            sessionPrefs.edit {
+                putBoolean("IS_LOGGED_IN", false)
+            }
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }

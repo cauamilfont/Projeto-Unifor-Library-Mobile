@@ -1,5 +1,6 @@
 package com.example.telaslivros
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -23,6 +24,20 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+
+        val sessionPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        val logged = sessionPrefs.getBoolean("IS_LOGGED_IN", false)
+        val role = sessionPrefs.getString("USER_ROLE", null)
+        if(logged){
+            if(role.equals("user", ignoreCase = true)) {
+                val intent = Intent(this, ExploreBooksActivity::class.java)
+                startActivity(intent)
+            }
+            if(role.equals("admin", ignoreCase = true)) {
+                val intent = Intent(this, AdminPanelActivity::class.java)
+                startActivity(intent)
+            }
+        }
 
         login.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
