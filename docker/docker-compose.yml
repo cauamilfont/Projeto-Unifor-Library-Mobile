@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres_livros
+    environment:
+      POSTGRES_DB: gestao_livros
+      POSTGRES_USER: bibli
+      POSTGRES_PASSWORD: "bibli2025@"
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend_net
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_livros
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@gestar.com
+      PGADMIN_DEFAULT_PASSWORD: admin1234
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - backend_net
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  pgadmin_data:
+
+networks:
+  backend_net:
+    driver: bridge
