@@ -11,6 +11,7 @@ composeBom = "2024.09.00"
 material = "1.13.0"
 glide = "4.16.0"
 desugarJdkLibs = "2.0.4"
+postgresql = "42.2.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -31,6 +32,7 @@ material = { module = "com.google.android.material:material", version.ref = "mat
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 glide-compiler = { group = "com.github.bumptech.glide", name = "compiler", version.ref = "glide" }
 desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdkLibs" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -10,6 +10,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LoginActivity : AppCompatActivity() {
 
@@ -33,54 +37,65 @@ class LoginActivity : AppCompatActivity() {
         password= findViewById(R.id.etSenhaLogin)
 
 
+        lifecycleScope.launch(Dispatchers.IO) {
+                val admin = DatabaseHelper.verifyEmail("admin@teste.com")
+                if (!admin)
+                    DatabaseHelper.setAdmin()
+            }
     }
 
     override fun onStart() {
         super.onStart()
 
-        val userDatabase = getSharedPreferences("user_database", MODE_PRIVATE)
+
         enter.setOnClickListener {
 
-           if(email.text.toString().isBlank() || password.text.toString().isBlank()){
-               Toast.makeText(this, "Por favor, preencha todos os campos", Toast.LENGTH_SHORT).show()
-               return@setOnClickListener
-           }
-            val login = userDatabase.getString("user_${email.text}", null)
-            var loginSuccess = false
-            var userRole = "user"
-
-            if(login != null){
-                val parts = login.split(",")
-                val savedPassword = parts[0]
-                val savedRole = parts[1]
-
-                if (password.text.toString() == savedPassword) {
-                    loginSuccess = true
-                    userRole = savedRole
-                }
+            if (email.text.toString().isBlank() || password.text.toString().isBlank()) {
+                Toast.makeText(this, "Por favor, preencha todos os campos", Toast.LENGTH_SHORT)
+                    .show()
+                return@setOnClickListener
             }
-            if (loginSuccess) {
 
-                Toast.makeText(this, "Login bem-sucedido!", Toast.LENGTH_SHORT).show()
+            lifecycleScope.launch(Dispatchers.IO) {
+                val user = DatabaseHelper.loginUser(email.text.toString(), password.text.toString())
 
-                val sessionPrefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-                sessionPrefs.edit {
-                    putBoolean("IS_LOGGED_IN", true)
-                    putString("USER_ROLE", userRole)
+                withContext(Dispatchers.Main) {
+
+
+                    if (user != null) {
+
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Login bem-sucedido!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        val sessionPrefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                        sessionPrefs.edit {
+                            putBoolean("IS_LOGGED_IN", true)
+                            putInt("USER_ID", user.id)
+                            putString("USER_ROLE", user.role.toString())
+                        }
+
+                        if (user.role.toString().equals("admin", ignoreCase = true)) {
+                            val intent = Intent(this@LoginActivity, AdminPanelActivity::class.java)
+                            startActivity(intent)
+                        } else {
+                            val intent =
+                                Intent(this@LoginActivity, ExploreBooksActivity::class.java)
+                            startActivity(intent)
+                        }
+
+                        finish()
+
+                    } else {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "E-mail ou senha inválidos",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
-
-                if (userRole.equals("admin", ignoreCase = true)) {
-                    val intent = Intent(this, AdminPanelActivity::class.java)
-                    startActivity(intent)
-                } else {
-                    val intent = Intent(this, ExploreBooksActivity::class.java)
-                    startActivity(intent)
-                }
-
-                finish()
-
-            } else {
-                Toast.makeText(this, "E-mail ou senha inválidos", Toast.LENGTH_SHORT).show()
             }
         }
 

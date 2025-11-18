@@ -30,8 +30,8 @@ class RecoveryPasswordActivity : AppCompatActivity() {
         val sharedPrefs = getSharedPreferences("user_database", Context.MODE_PRIVATE)
 
         btnSend.setOnClickListener {
-            val existentAccount = sharedPrefs.getString("user_${email.text}", null)
-            if(existentAccount == null){
+            val existentAccount = DatabaseHelper.verifyEmail(email.text.toString())
+            if(!existentAccount){
                 Toast.makeText(this, "Email não existente", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
