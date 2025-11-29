@@ -176,6 +176,8 @@
                 android:layout_marginTop="32dp"
                 android:paddingVertical="12dp"
                 android:text="Salvar"
+                android:backgroundTint="#1E88E5"
+                android:textStyle="bold"
                 android:textSize="18sp"
                 app:cornerRadius="8dp"/>
 

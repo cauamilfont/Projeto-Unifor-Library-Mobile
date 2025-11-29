@@ -48,6 +48,8 @@
         android:text="Detalhes" android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:textAllCaps="false"
+        android:backgroundTint="#1E88E5"
+        android:textStyle="bold"
         app:cornerRadius="8dp"/> </RelativeLayout>
 
 </com.google.android.material.card.MaterialCardView>

@@ -246,10 +246,11 @@
                 android:layout_height="wrap_content"
                 android:text="Solicitar Aluguel"
                 android:textAllCaps="false"
-                android:textStyle="bold"
-                android:backgroundTint="#007AFF"
                 android:textColor="#FFFFFF"
                 android:padding="12dp"
+                android:backgroundTint="#1E88E5"
+                app:cornerRadius="8dp"
+                android:textStyle="bold"
                 android:layout_marginTop="32dp"
                 android:layout_marginBottom="16dp" />
 

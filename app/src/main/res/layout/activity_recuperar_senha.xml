@@ -97,6 +97,8 @@
                 android:text="@string/botao_enviar_codigo"
                 android:paddingVertical="12dp"
                 app:cornerRadius="8dp"
+                android:backgroundTint="#1E88E5"
+                android:textStyle="bold"
                 android:layout_marginBottom="24dp" />
 
 
@@ -105,7 +107,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/link_voltar_login"
-                android:textColor="?attr/colorPrimary"
+                android:textColor="#1E88E5"
                 android:layout_marginTop="8dp"
                 android:clickable="true"
                 android:focusable="true"/>

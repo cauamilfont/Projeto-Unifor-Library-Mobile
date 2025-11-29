@@ -75,7 +75,7 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:src="@drawable/ic_upload_image"
-                        app:tint="?attr/colorPrimary"
+                        app:tint="#1E88E5"
                         android:contentDescription="Upload da Capa" />
 
                     <TextView
@@ -195,6 +195,9 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
+                android:backgroundTint="#1E88E5"
+                app:cornerRadius="8dp"
+                android:textStyle="bold"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="16dp"
                 android:paddingVertical="12dp"/>

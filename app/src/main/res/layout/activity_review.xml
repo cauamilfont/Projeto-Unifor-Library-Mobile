@@ -116,8 +116,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/btn_enviar_avaliacao"
-                android:background="@drawable/rounded_button"
-                android:textColor="@android:color/black"
+                android:backgroundTint="#1E88E5"
+                app:cornerRadius="8dp"
+                android:textStyle="bold"
                 android:textSize="18sp"
                 android:padding="12dp"
                 android:layout_gravity="center_horizontal|bottom"/>

@@ -94,9 +94,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="FABChat"
-                app:backgroundTint="?attr/colorPrimary"
                 app:srcCompat="@drawable/ic_chat"
                 app:tint="@color/white"
+                android:backgroundTint="#1E88E5"
+                app:cornerRadius="8dp"
+                android:textStyle="bold"
                 android:layout_marginBottom="40dp"/>
 
         </LinearLayout>
