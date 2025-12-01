@@ -8,7 +8,6 @@
     android:background="#FFFFFF"
     tools:context=".ChatBotActivity">
 
-    <!-- Cabeçalho -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,7 +27,8 @@
 
         <TextView
             android:id="@+id/tvTitulo"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="Chatbot"
             android:textAlignment="center"
@@ -41,66 +41,20 @@
         android:layout_height="1dp"
         android:background="#D0D0D0" />
 
-    <!-- Área do chat -->
-    <ScrollView
-        android:id="@+id/scrollMensagens"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMessages"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="16dp">
+        android:paddingHorizontal="8dp"
+        android:paddingTop="8dp"
+        android:clipToPadding="false"
+        tools:listitem="@layout/item_chat_message"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-        <LinearLayout
-            android:id="@+id/containerMensagens"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
 
-            <!-- Mensagem do bot -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Olá! Como posso ajudar?"
-                android:textSize="14sp"
-                android:padding="8dp"
-                android:layout_marginBottom="8dp"
-                android:backgroundTint="#E0E0E0"
-                android:layout_gravity="start"
-                android:background="@drawable/bg_mensagem" />
-
-            <!-- Opções -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#E0E0E0"
-                android:text="1 - Status do aluguel"
-                android:textSize="14sp"
-                android:padding="8dp"
-                android:layout_marginBottom="6dp"
-                android:layout_gravity="start" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#E0E0E0"
-                android:text="2 - Buscar livros"
-                android:textSize="14sp"
-                android:padding="8dp"
-                android:layout_marginBottom="6dp"
-                android:layout_gravity="start" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#E0E0E0"
-                android:text="3 - Reportar problema"
-                android:textSize="14sp"
-                android:padding="8dp"
-                android:layout_gravity="start" />
-        </LinearLayout>
-    </ScrollView>
-
-    <!-- Campo de digitação -->
     <LinearLayout
+        android:id="@+id/inputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -115,15 +69,14 @@
             android:layout_weight="1"
             android:hint="Digite sua mensagem..."
             android:padding="10dp"
-            android:background="@android:drawable/editbox_background_normal" />
-
-        <ImageButton
-            android:id="@+id/btnEnviar"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@android:drawable/ic_btn_speak_now"
-            android:background="@android:color/transparent"
-            android:contentDescription="Enviar mensagem" />
+            android:background="@drawable/editbox_rounded" /> <ImageButton
+        android:id="@+id/btnEnviar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_send"
+        android:background="@android:color/transparent"
+        android:contentDescription="Enviar mensagem"
+        app:tint="?attr/colorPrimary" />
     </LinearLayout>
 
 
@@ -132,12 +85,10 @@
         style="@style/Widget.Material3.BottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:background="#F7F2FA"
         app:itemActiveIndicatorStyle="@style/App.Custom.Indicator"
         app:itemIconTint="@color/bottom_nav_item_color_selector"
         app:itemTextColor="@color/bottom_nav_item_color_selector"
-        app:labelVisibilityMode="labeled"
-         />
+        app:labelVisibilityMode="labeled" />
 
 </LinearLayout>

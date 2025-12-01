@@ -6,8 +6,13 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -64,13 +69,87 @@ class DetailsRequestActivity : BaseActivity() {
             .into(cover)
 
         btnAccept.setOnClickListener {
-            val intent = Intent(this, ManageRequestsActivity::class.java)
-            startActivity(intent)
+
+            // 1. Recuperar o ID da solicitação que veio da tela anterior (Adapter)
+            // Ajuste a chave "EXTRA_TRANSACTION_ID" se você usou outro nome no Adapter
+            val rentIdString = intent.getStringExtra("EXTRA_TRANSACTION_ID")
+            val rentId = rentIdString?.toIntOrNull() ?: 0
+
+            // Validação de segurança
+            if (rentId == 0) {
+                Toast.makeText(this, "Erro: ID da solicitação inválido", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // 2. Inicia a operação em SEGUNDO PLANO (IO)
+            lifecycleScope.launch(Dispatchers.IO) {
+
+                // Chama a sua função no DatabaseHelper
+                // Ela vai atualizar o status para 'Aprovado' e gerar o código
+                val codigoGerado = DatabaseHelper.approveRent(rentId)
+
+                // 3. Volta para a Thread PRINCIPAL (Main) para mexer na tela
+                withContext(Dispatchers.Main) {
+
+                    if (codigoGerado != null) {
+                        // --- SUCESSO ---
+                        Toast.makeText(
+                            applicationContext,
+                            "Solicitação Aprovada! Código: $codigoGerado",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                        // Navega de volta para a lista de solicitações
+                        val intent = Intent(this@DetailsRequestActivity, ManageRequestsActivity::class.java)
+
+                        // (Opcional) Essas flags limpam a tela de detalhes da memória,
+                        // para que o botão voltar não traga o usuário aqui de novo.
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+
+                        startActivity(intent)
+                        finish() // Fecha a tela atual
+
+                    } else {
+                        // --- ERRO ---
+                        Toast.makeText(
+                            applicationContext,
+                            "Erro ao aprovar. Tente novamente.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
         }
 
         btnDecline.setOnClickListener {
-            val intent = Intent(this, ManageRequestsActivity::class.java)
-            startActivity(intent)
+            val rentIdString = intent.getStringExtra("EXTRA_TRANSACTION_ID")
+            val rentId = rentIdString?.toIntOrNull() ?: 0
+
+            if (rentId == 0) {
+                Toast.makeText(this, "Erro: ID inválido", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+
+
+            lifecycleScope.launch(Dispatchers.IO) {
+
+                val sucesso = DatabaseHelper.declineRent(rentId)
+
+                withContext(Dispatchers.Main) {
+                    if (sucesso) {
+                        Toast.makeText(this@DetailsRequestActivity, "Solicitação recusada.", Toast.LENGTH_SHORT).show()
+
+
+                        val intent = Intent(this@DetailsRequestActivity, ManageRequestsActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        Toast.makeText(this@DetailsRequestActivity, "Erro ao recusar.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
     }
 }

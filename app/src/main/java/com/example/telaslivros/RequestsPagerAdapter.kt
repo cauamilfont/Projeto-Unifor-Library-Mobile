@@ -12,7 +12,7 @@ class RequestsPagerAdapter (activity: FragmentActivity) : FragmentStateAdapter(a
         return when (position) {
             0 -> RequestsFragment.newInstance("Pendente")
             1 -> RequestsFragment.newInstance("Aprovado")
-            2 -> RequestsFragment.newInstance("Recusado")
+            2 -> RequestsFragment.newInstance("Devolvido")
             else -> throw IllegalStateException("Posição inválida")
         }
     }

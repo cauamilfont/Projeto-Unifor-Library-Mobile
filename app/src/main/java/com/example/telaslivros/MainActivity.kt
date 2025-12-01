@@ -3,6 +3,7 @@ package com.example.telaslivros
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -25,18 +26,22 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
-        val sessionPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        val logged = sessionPrefs.getBoolean("IS_LOGGED_IN", false)
-        val role = sessionPrefs.getString("USER_ROLE", null)
-        if(logged){
-            if(role.equals("user", ignoreCase = true)) {
-                val intent = Intent(this, ExploreBooksActivity::class.java)
-                startActivity(intent)
+        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val token = prefs.getString("AUTH_TOKEN", null)
+
+        Log.e("TOKEN_3", token.toString())
+
+        if (token != null && JwtHelper.validateToken(token)) {
+
+
+            val role = prefs.getString("USER_ROLE", "user")
+
+            if (role.equals("admin", ignoreCase = true)) {
+                startActivity(Intent(this, AdminPanelActivity::class.java))
+            } else {
+                startActivity(Intent(this, ExploreBooksActivity::class.java))
             }
-            if(role.equals("admin", ignoreCase = true)) {
-                val intent = Intent(this, AdminPanelActivity::class.java)
-                startActivity(intent)
-            }
+            finish()
         }
 
         login.setOnClickListener {

@@ -2,6 +2,7 @@ package com.example.telaslivros
 
 
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +33,8 @@ class ExploreBooksAdapter(private val bookList : MutableList<Book>) :
     override fun onBindViewHolder(holder: ExploreBookViewHolder, position: Int) {
         val books = bookList[position]
 
+        Log.e("BooksId", books.id.toString())
+        val id : Int = books.id
         val bookTitle: String = books.title
         val urlImage : String = books.imageURL
         val author : String = books.author
@@ -51,6 +54,7 @@ class ExploreBooksAdapter(private val bookList : MutableList<Book>) :
         holder.itemView.setOnClickListener {
             val context = holder.itemView.context
             val intent = Intent(context, BookDetailsActivity::class.java)
+            intent.putExtra("BOOK_ID", id)
             intent.putExtra("TITLE", bookTitle)
             intent.putExtra("URL_IMAGE", urlImage)
             intent.putExtra("AUTHOR", author)

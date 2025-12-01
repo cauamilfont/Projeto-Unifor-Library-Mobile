@@ -6,7 +6,11 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.edit
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class PerfilActivityUser : BaseActivity() {
@@ -38,18 +42,23 @@ class PerfilActivityUser : BaseActivity() {
     override fun onStart(){
         super.onStart()
         val sessionPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        val userId = sessionPrefs.getInt("USER_ID", 0)
+        val userId = sessionPrefs.getInt("USER_ID_INT", 0)
 
-        val user = DatabaseHelper.getUser(userId)
-        if(user != null) {
-            userName.text = user.nomeCompleto
-            userEmail.text = user.email
+        lifecycleScope.launch(Dispatchers.IO) {
+            val user = DatabaseHelper.getUser(userId)
+            if (user != null) {
+                withContext(Dispatchers.Main) {
+                    userName.text = user.nomeCompleto
+                    userEmail.text = user.email
 
-            Glide.with(this)
-                .load(user.fotoPerfil)
-                .placeholder(R.drawable.ic_person_edit)
-                .circleCrop()
-                .into(userImage)
+                    Glide.with(this@PerfilActivityUser)
+                        .load(user.fotoPerfil)
+                        .placeholder(R.drawable.ic_person_edit)
+                        .circleCrop()
+                        .into(userImage)
+                }
+            }
+
         }
 
         editProfile.setOnClickListener {
@@ -71,6 +80,10 @@ class PerfilActivityUser : BaseActivity() {
 
             sessionPrefs.edit {
                 putBoolean("IS_LOGGED_IN", false)
+                putString("AUTH_TOKEN", null)
+                putString("USER_ID", null)
+                putString("USER_ROLE", null)
+                putInt("USER_ID_INT", 0)
             }
             val intent = Intent(this, LoginActivity::class.java )
             startActivity(intent)

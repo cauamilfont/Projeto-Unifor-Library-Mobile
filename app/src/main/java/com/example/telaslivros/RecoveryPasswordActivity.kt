@@ -31,7 +31,7 @@ class RecoveryPasswordActivity : AppCompatActivity() {
 
         btnSend.setOnClickListener {
             val existentAccount = DatabaseHelper.verifyEmail(email.text.toString())
-            if(!existentAccount){
+            if(existentAccount == 0){
                 Toast.makeText(this, "Email não existente", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }

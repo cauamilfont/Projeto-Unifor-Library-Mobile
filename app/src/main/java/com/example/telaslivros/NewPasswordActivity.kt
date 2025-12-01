@@ -6,8 +6,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.textfield.TextInputEditText
-import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,8 +32,8 @@ class NewPasswordActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         btnConfirm.setOnClickListener {
-            val userEmail = intent.getStringExtra("USER_EMAIL")
-            if (userEmail == null) {
+            val userId = intent.getIntExtra("USER_ID", 0)
+            if (userId == 0) {
                 Toast.makeText(this, "Erro fatal. E-mail não encontrado.", Toast.LENGTH_SHORT)
                     .show()
                 finish()
@@ -49,7 +47,7 @@ class NewPasswordActivity : AppCompatActivity() {
             }
             lifecycleScope.launch(Dispatchers.IO) {
                 val userDatabase =
-                    DatabaseHelper.changePassword(newPasswordText, userEmail.toString())
+                    DatabaseHelper.changePassword(newPasswordText, userId)
 
                 withContext(Dispatchers.Main) {
                     if (userDatabase) {

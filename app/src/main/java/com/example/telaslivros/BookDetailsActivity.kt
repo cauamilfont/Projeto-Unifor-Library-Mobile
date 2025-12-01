@@ -1,16 +1,24 @@
 package com.example.telaslivros
 
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.util.Calendar
 
 
@@ -66,12 +74,79 @@ class BookDetailsActivity : BaseActivity() {
             .into(cover)
 
         requestButton.setOnClickListener {
-            val urlImage : String? = intent.getStringExtra("URL_IMAGE")
-            val intent = Intent(this, RentRequestActivity::class.java)
-            intent.putExtra("TITLE", title.text)
-            intent.putExtra("AUTHOR", author.text)
-            intent.putExtra("URL_IMAGE", urlImage )
-            startActivity(intent)
+            val inputInitialDate = convertToLocalDate(etInitialDate.text.toString())
+            val inputFinalDate = convertToLocalDate(etFinalDate.text.toString())
+
+
+                if (inputInitialDate == null) {
+                    etInitialDate.error = "Data inválida! Use DD/MM/AAAA"
+                    return@setOnClickListener
+                }
+                if (inputFinalDate == null) {
+                    etInitialDate.error = "Data inválida! Use DD/MM/AAAA"
+                    return@setOnClickListener
+                }
+            lifecycleScope.launch(Dispatchers.IO) {
+                val disponibility =
+                    DatabaseHelper.checkDisponibility(1, inputInitialDate, inputFinalDate)
+                val sessionPrefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                val userId = sessionPrefs.getInt("USER_ID_INT", 0)
+                val bookId = intent.getIntExtra("BOOK_ID", 0)
+
+
+                if (userId == 0) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            applicationContext,
+                            "Faça login novamente",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    return@launch
+                }
+
+                if (!disponibility) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            applicationContext,
+                            "O livro não está disponível nesse período",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    return@launch
+
+            }
+                Log.e("BOOKID", bookId.toString())
+            val rent = Rent(
+                bookId = bookId,
+                userId = userId,
+                initialDate = inputInitialDate ,
+                finalDate =  inputFinalDate,
+                book = null,
+                userName = ""
+                )
+            val rentId = DatabaseHelper.createRent(rent)
+            if(rentId == 0) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        applicationContext,
+                        "Ocorreu um erro ao solicitar a reserva, tente novamente!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                    return@launch
+                }
+                val urlImage : String? = intent.getStringExtra("URL_IMAGE")
+                val intent = Intent(this@BookDetailsActivity, RentRequestActivity::class.java)
+                intent.putExtra("TITLE", title.text)
+                intent.putExtra("AUTHOR", author.text)
+                intent.putExtra("URL_IMAGE", urlImage )
+                startActivity(intent)
+            }
+
+
+
+
         }
 
         btnBack.setOnClickListener {
@@ -111,5 +186,23 @@ class BookDetailsActivity : BaseActivity() {
 
 
         datePickerDialog.show()
+    }
+
+    fun convertToLocalDate(dateString: String): LocalDate? {
+
+        if (dateString.isBlank()) {
+            return null
+        }
+
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
+
+        return try {
+            LocalDate.parse(dateString, formatter)
+        } catch (e: DateTimeParseException) {
+
+            Log.e("DATA_CONVERSION", "Formato de data inválido ou data inexistente: $dateString", e)
+            null
+        }
     }
 }

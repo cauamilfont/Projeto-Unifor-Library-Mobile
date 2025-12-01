@@ -63,6 +63,7 @@ class AddBooksActivity : BaseActivity() {
 
 
         val novoLivro = Book(
+            id = 1,
             title = titulo,
             author = autor,
             imageURL = urlImagemPlaceholder,

@@ -37,7 +37,7 @@ class ManageRequestsActivity : BaseActivity() {
             tab.text = when (position) {
                 0 -> "Pendentes"
                 1 -> "Aprovadas"
-                2 -> "Recusadas"
+                2 -> "Finalizadas"
                 else -> null
             }
         }.attach()

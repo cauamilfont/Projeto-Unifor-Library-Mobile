@@ -45,5 +45,4 @@ class ExploreBooksActivity : BaseActivity() {
         adapter.notifyDataSetChanged()
     }
 
-    // A FUNÇÃO createMockData() FOI REMOVIDA DAQUI
 }

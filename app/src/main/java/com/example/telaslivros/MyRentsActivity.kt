@@ -12,19 +12,18 @@ class MyRentsActivity : BaseActivity() {
 
     override fun getBottomNavItemId() = R.id.navigation_alugueis
 
-    lateinit var backBtn : ImageButton
+
+    private lateinit var backBtn: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         setContentView(R.layout.activity_meus_alugueis)
-
-
 
         val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
         val viewPager = findViewById<ViewPager2>(R.id.viewPager)
-         backBtn  = findViewById(R.id.backBtn)
-
+        backBtn = findViewById(R.id.backBtn)
 
         val adapter = RentsPagerAdapter(this)
         viewPager.adapter = adapter
@@ -39,14 +38,12 @@ class MyRentsActivity : BaseActivity() {
             }
         }.attach()
 
-        setupBottomNavigation()
-    }
 
-    override fun onStart() {
-        super.onStart()
         backBtn.setOnClickListener {
             finish()
-
         }
+
+
+        setupBottomNavigation()
     }
 }

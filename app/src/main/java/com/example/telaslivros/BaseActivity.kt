@@ -1,17 +1,47 @@
 package com.example.telaslivros
 
+import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.core.view.size
+import androidx.core.content.edit
 
 
 abstract class BaseActivity : AppCompatActivity() {
     abstract fun getBottomNavItemId(): Int
 
     private lateinit var bottomNav: BottomNavigationView
+
+    override fun onStart() {
+        super.onStart()
+
+        // --- LÓGICA DE SEGURANÇA (O "SEGURANÇA") ---
+        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val token = prefs.getString("AUTH_TOKEN", null)
+
+        Log.e("TOKEN_2", token.toString())
+        // Verificamos se o token NÃO é válido (ou nulo)
+        if (token == null || !JwtHelper.validateToken(token)) {
+            // Se estiver inválido, desloga e manda pro Login
+            Toast.makeText(this, "Sessão expirada. Faça login novamente.", Toast.LENGTH_SHORT).show()
+
+            // Limpa dados
+            prefs.edit { clear() }
+
+            val intent = Intent(this, LoginActivity::class.java)
+            // Limpa a pilha para o usuário não poder voltar
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+        }
+
+    }
+
 
     override fun onResume() {
         super.onResume()
@@ -45,7 +75,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
 
         val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        val userRole = sharedPrefs.getString("EMAIL", "user") ?: "user"
+        val userRole = sharedPrefs.getString("USER_ROLE", "user") ?: "user"
 
 
         bottomNav.menu.clear()

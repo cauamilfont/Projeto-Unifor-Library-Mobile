@@ -46,6 +46,12 @@ android {
 
 dependencies {
 
+    implementation("com.google.zxing:core:3.5.3")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-orgjson:0.11.5")
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
     implementation(libs.postgresql)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

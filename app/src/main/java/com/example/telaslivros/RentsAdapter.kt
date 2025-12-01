@@ -19,14 +19,11 @@ class RentsAdapter(private val rents: List<Rent>) :
         val cover: ImageView = view.findViewById(R.id.ivBookCover)
     }
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RentViewHolder {
-
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_rent_book, parent, false)
         return RentViewHolder(view)
     }
-
 
     override fun getItemCount() = rents.size
 
@@ -34,27 +31,38 @@ class RentsAdapter(private val rents: List<Rent>) :
         val rent = rents[position]
 
 
-        holder.title.text = "Título: ${rent.title}"
-        holder.author.text = "Autor: ${rent.author}"
+        holder.title.text = "Título: ${rent.book?.title}"
+        holder.author.text = "Autor: ${rent.book?.author}"
+
+
         holder.status.text = "Status:\n${rent.status}"
 
+
         Glide.with(holder.itemView.context)
-            .load(rent.imageUrl)
+            .load(rent.book?.imageURL)
             .placeholder(R.drawable.ic_book_placeholder)
             .error(R.drawable.ic_book_error)
             .into(holder.cover)
 
-        if(rent.status.equals("aprovado", ignoreCase = true )) {
+
+        if (rent.status == Status.APROVADO) {
+
             holder.itemView.setOnClickListener {
                 val context = holder.itemView.context
+
                 val intent = Intent(context, RemovalActivity::class.java)
-                intent.putExtra("TITLE", rent.title)
-                intent.putExtra("USER", rent.user)
+
+
+                intent.putExtra("EXTRA_TRANSACTION_ID", rent.id.toString())
+                intent.putExtra("BOOK_TITLE", rent.book?.title)
+                intent.putExtra("BOOK_AUTHOR", rent.book?.author)
+                intent.putExtra("USER_NAME", rent.userName)
+
                 context.startActivity(intent)
             }
+        } else {
+
+            holder.itemView.setOnClickListener(null)
         }
-
-
-
     }
 }

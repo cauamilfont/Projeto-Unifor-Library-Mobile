@@ -3,6 +3,7 @@ package com.example.telaslivros
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -39,7 +40,7 @@ class LoginActivity : AppCompatActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
                 val admin = DatabaseHelper.verifyEmail("admin@teste.com")
-                if (!admin)
+                if (admin == 0)
                     DatabaseHelper.setAdmin()
             }
     }
@@ -63,18 +64,21 @@ class LoginActivity : AppCompatActivity() {
 
 
                     if (user != null) {
+                        // 1. GERA O TOKEN JWT
+                        val token = JwtHelper.generateToken(user.id, user.role.toString())
 
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Login bem-sucedido!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
+                        Log.e("TOKEN", token)
                         val sessionPrefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
                         sessionPrefs.edit {
-                            putBoolean("IS_LOGGED_IN", true)
-                            putInt("USER_ID", user.id)
+                            // Salva o Token em vez de apenas flags soltas
+                            putString("AUTH_TOKEN", token)
+
+                            // Ainda guardamos esses para acesso rápido na UI, mas a segurança vem do token
+                            putInt("USER_ID_INT", user.id)
+                            putString("USER_NAME", user.name)
                             putString("USER_ROLE", user.role.toString())
+
+                            putBoolean("IS_LOGGED_IN", true)
                         }
 
                         if (user.role.toString().equals("admin", ignoreCase = true)) {

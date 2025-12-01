@@ -17,6 +17,7 @@ object BookRepository {
     private fun createMockData() : MutableList<Book>{
         return mutableListOf(
             Book(
+                id = 1,
                 title = "A Culpa é das Estrelas",
                 author = "John Green",
                 imageURL = "https://m.media-amazon.com/images/I/811ivBP1rsL._UF1000,1000_QL80_.jpg",
@@ -27,6 +28,7 @@ object BookRepository {
                 genre = "Romance"
             ),
             Book(
+                id = 2,
                 title = "O Pequeno Príncipe",
                 author = "Antoine de Saint-Exupéry",
                 imageURL = "https://m.media-amazon.com/images/I/81TmOZIXvzL._UF1000,1000_QL80_.jpg",
@@ -37,6 +39,7 @@ object BookRepository {
                 genre = "Literatura Infantil"
             ),
             Book(
+                id = 3,
                 title = "Duna",
                 author = "Frank Herbert",
                 imageURL = "https://m.media-amazon.com/images/I/81zN7udGRUL.jpg",
@@ -47,6 +50,7 @@ object BookRepository {
                 genre = "Ficção Científica"
             ),
             Book(
+                id = 4,
                 title = "1984",
                 author = "George Orwell",
                 imageURL = "https://m.media-amazon.com/images/I/61t0bwt1s3L._AC_UF1000,1000_QL80_.jpg",
@@ -58,6 +62,7 @@ object BookRepository {
             ),
 
             Book(
+                id = 5,
                 title = "Harry Potter e a Pedra Filosofal",
                 author = "J.K. Rowling",
                 imageURL = "https://m.media-amazon.com/images/I/61jgm6ooXzL._AC_UF1000,1000_QL80_.jpg",

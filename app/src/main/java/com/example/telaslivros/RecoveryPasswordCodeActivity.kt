@@ -40,7 +40,7 @@ class RecoveryPasswordCodeActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        val userEmail = intent.getStringExtra("EMAIL")
+        val userId = intent.getIntExtra("USER_ID", 0)
         val mockCode = intent.getStringExtra("CODE")
         btnContinue.setOnClickListener {
             val insertCode = "${code1.text.toString()}${code2.text.toString()}${code3.text.toString()}" +
@@ -51,7 +51,7 @@ class RecoveryPasswordCodeActivity : AppCompatActivity() {
                 Toast.makeText(this, "Código correto!", Toast.LENGTH_SHORT).show()
 
                 val intent = Intent(this, NewPasswordActivity::class.java)
-                intent.putExtra("USER_EMAIL", userEmail)
+                intent.putExtra("USER_EMAIL", userId)
                 startActivity(intent)
             }
             else{

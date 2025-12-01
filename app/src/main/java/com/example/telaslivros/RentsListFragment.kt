@@ -1,26 +1,28 @@
 package com.example.telaslivros
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
 class RentsListFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var rentsAdapter: RentsAdapter
-
-
+    // Inicializamos como null ou garantimos inicialização no onViewCreated
+    private var rentsAdapter: RentsAdapter? = null
     private var listType: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
         arguments?.let {
             listType = it.getString(ARG_LIST_TYPE)
         }
@@ -30,49 +32,64 @@ class RentsListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // Infla o layout que contém apenas o RecyclerView
         return inflater.inflate(R.layout.fragment_rents_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-        val mockData = criarComentariosMock(listType)
-
         recyclerView = view.findViewById(R.id.recyclerViewRents)
-        rentsAdapter = RentsAdapter(mockData)
         recyclerView.layoutManager = LinearLayoutManager(context)
+
+
+
+        rentsAdapter = RentsAdapter(emptyList())
         recyclerView.adapter = rentsAdapter
+
+
+
+        loadRentsFromDatabase()
     }
 
+    private fun loadRentsFromDatabase() {
 
-    private fun criarComentariosMock(tipo: String?): List<Rent> {
-        val todosOsAlugueis = listOf(
-            Rent("A Culpa é das Estrelas", "John Green", "João Luiz","Pendente", "https://m.media-amazon.com/images/I/811ivBP1rsL._UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 26),
-                LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) ),
-            Rent("O Pequeno Príncipe", "Antoine de Saint-Exupéry", "João Luiz", "Pendente", "https://m.media-amazon.com/images/I/81TmOZIXvzL._UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 26),
-                LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) ),
-            Rent("Duna", "Frank Herbert", "João Luiz","Aprovado", "https://m.media-amazon.com/images/I/81zN7udGRUL.jpg", LocalDate.of(2025, 10, 26),
-                LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) ),
-            Rent("O Senhor dos Anéis", "J.R.R. Tolkien", "João Luiz","Aprovado", "https://m.media-amazon.com/images/I/71ZLavBjpRL._AC_UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 26),
-                LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) ),
-            Rent("1984", "George Orwell", "João Luiz","Histórico", "https://m.media-amazon.com/images/I/61t0bwt1s3L._AC_UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 26),
-                LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) ),
-            Rent("Harry Potter e a Pedra Filosofal", "J.K. Rowling", "João Luiz","Histórico", "https://m.media-amazon.com/images/I/61jgm6ooXzL._AC_UF1000,1000_QL80_.jpg", LocalDate.of(2025, 10, 26),
-                LocalDate.of(2025, 10, 28), LocalDate.of(2025, 11, 4) )
-        )
+        if (!isAdded) return
+
+        val sharedPrefs = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val userId = sharedPrefs.getInt("USER_ID_INT", 0)
+
+        if (userId == 0) return
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            // 3. Busca os dados no banco (Background)
+            val allRents = DatabaseHelper.getAllRents(userId)
+
+            val userRents = allRents.filter { it.userId == userId }
+
+            val filteredList = when (listType) {
+                "PENDENTE" -> userRents.filter { it.status == Status.PENDENTE }
+                "APROVADO" -> userRents.filter { it.status == Status.APROVADO }
+                "HISTORICO" -> userRents.filter {
+                    it.status == Status.DEVOLVIDO ||
+                            it.status == Status.RECUSADO
+                }
+                else -> emptyList()
+            }
 
 
-        if (tipo == null) return emptyList()
+            withContext(Dispatchers.Main) {
 
-        return when (tipo) {
-            "PENDENTE" -> todosOsAlugueis.filter { it.status == "Pendente" }
-            "APROVADO" -> todosOsAlugueis.filter { it.status == "Aprovado" }
-            "HISTORICO" -> todosOsAlugueis.filter { it.status == "Histórico" }
-            else -> emptyList()
+                if (isAdded) {
+                    rentsAdapter = RentsAdapter(filteredList)
+                    recyclerView.adapter = rentsAdapter
+
+
+
+                }
+            }
         }
     }
-
 
     companion object {
         private const val ARG_LIST_TYPE = "arg_list_type"

@@ -19,6 +19,7 @@ class RegisterActivity : AppCompatActivity() {
 
     lateinit var name: TextInputEditText
     lateinit var email: TextInputEditText
+    lateinit var cpf: TextInputEditText
     lateinit var password: TextInputEditText
     lateinit var confirmPassword: TextInputEditText
     lateinit var acceptTerms: MaterialCheckBox
@@ -32,6 +33,7 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_cadastro)
         name = findViewById(R.id.etNome)
         email = findViewById(R.id.etEmail)
+        cpf = findViewById(R.id.etCPF)
         password = findViewById(R.id.etSenha)
         confirmPassword = findViewById(R.id.etConfirmarSenha)
         acceptTerms = findViewById(R.id.cbTermos)
@@ -69,6 +71,7 @@ class RegisterActivity : AppCompatActivity() {
             if (name.text.toString().isBlank() || email.text.toString()
                     .isBlank() || password.text.toString()
                     .isBlank() || confirmPassword.text.toString().isBlank()
+                || cpf.text.toString().isBlank()
             ) {
                 Toast.makeText(this, "Por favor, preencha todos os campos", Toast.LENGTH_SHORT)
                     .show()
@@ -84,7 +87,7 @@ class RegisterActivity : AppCompatActivity() {
             }
             lifecycleScope.launch(Dispatchers.IO) {
                 val verifyEmail = DatabaseHelper.verifyEmail(email.text.toString())
-                if (verifyEmail) {
+                if (verifyEmail != 0) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(
                             this@RegisterActivity,
@@ -97,7 +100,8 @@ class RegisterActivity : AppCompatActivity() {
                 val success = DatabaseHelper.registerUser(
                     name.text.toString(),
                     email.text.toString(),
-                    password.text.toString()
+                    password.text.toString(),
+                     cpf.text.toString()
                 )
                 withContext(Dispatchers.Main) {
                     if (success) {

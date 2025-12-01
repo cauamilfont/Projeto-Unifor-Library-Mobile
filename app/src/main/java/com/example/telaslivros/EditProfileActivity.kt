@@ -60,12 +60,14 @@ class EditProfileActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
         val sessionPrefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val userId = sessionPrefs.getInt("USER_ID", 0)
+        val userId = sessionPrefs.getInt("USER_ID_INT", 0)
+        var userEmail = ""
         lifecycleScope.launch(Dispatchers.IO) {
             val user = DatabaseHelper.getUser(userId)
 
             withContext(Dispatchers.Main) {
                 if (user != null) {
+                    userEmail = user.email
 
                     userName.setText(user.nomeCompleto)
                     phone.setText(user.telefone)
@@ -86,9 +88,9 @@ class EditProfileActivity : BaseActivity() {
 
         saveButton.setOnClickListener {
             val userToUpdate = User(
-                id = userId,
+
                 nomeCompleto = userName.text.toString(),
-                email = "",
+                email = userEmail,
                 senhaHash = "",
                 telefone = phone.text.toString(),
                 cpf = cpf.text.toString(),
