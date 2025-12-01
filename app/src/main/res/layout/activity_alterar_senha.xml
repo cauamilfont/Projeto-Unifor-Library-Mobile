@@ -114,10 +114,12 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal|bottom"
                     android:layout_marginTop="32dp"
-                    android:background="@drawable/rounded_button"
                     android:padding="12dp"
                     android:text="@string/btn_salvar"
-                    android:textColor="@android:color/black"
+                    android:backgroundTint="#1E88E5"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
                     android:textSize="18sp" />
 
             </LinearLayout>
