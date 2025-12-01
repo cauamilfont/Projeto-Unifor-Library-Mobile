@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Nome">
+        <menu>
+            <item
+                android:id="@+id/action_sort_name_asc"
+                android:title="A-Z" />
+            <item
+                android:id="@+id/action_sort_name_desc"
+                android:title="Z-A" />
+        </menu>
+    </item>
+
+    <item android:title="Avaliação (Conteúdo)">
+        <menu>
+            <item
+                android:id="@+id/action_sort_quality_desc"
+                android:title="Maior para Menor" />
+            <item
+                android:id="@+id/action_sort_quality_asc"
+                android:title="Menor para Maior" />
+        </menu>
+    </item>
+
+    <item android:title="Avaliação (Física)">
+        <menu>
+            <item
+                android:id="@+id/action_sort_physical_desc"
+                android:title="Maior para Menor" />
+            <item
+                android:id="@+id/action_sort_physical_asc"
+                android:title="Menor para Maior" />
+        </menu>
+    </item>
+
+</menu>

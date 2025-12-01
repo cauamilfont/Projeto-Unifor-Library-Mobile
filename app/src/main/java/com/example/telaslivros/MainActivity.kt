@@ -20,6 +20,8 @@ class MainActivity : AppCompatActivity() {
         login = findViewById(R.id.btnEntrar)
         register = findViewById(R.id.btnCriarConta)
 
+        NotificationHelper.createChannel(this)
+
 
     }
 

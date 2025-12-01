@@ -60,6 +60,7 @@ class BookDetailsActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
+        val bookId = intent.getIntExtra("BOOK_ID", 0)
         title.text = "Título: ${intent.getStringExtra("TITLE")}"
         author.text = "Autor: ${intent.getStringExtra("AUTHOR")}"
         synopsys.text = intent.getStringExtra("SYNOPSYS")
@@ -67,11 +68,18 @@ class BookDetailsActivity : BaseActivity() {
         physicalQuality.text = "${intent.getFloatExtra("PHYSICAL_QUALITY", 0.0F)}/5"
         bookRB.rating = intent.getFloatExtra("BOOK_QUALITY", 0.0F)
         physicalRB.rating = intent.getFloatExtra("PHYSICAL_QUALITY", 0.0F)
-        Glide.with(this)
-            .load(intent.getStringExtra("URL_IMAGE"))
-            .placeholder(R.drawable.ic_book_placeholder)
-            .error(R.drawable.ic_book_error)
-            .into(cover)
+        lifecycleScope.launch(Dispatchers.IO) {
+            val bookDoBanco = DatabaseHelper.getBookById(bookId)
+
+            withContext(Dispatchers.Main) {
+                if (bookDoBanco != null) {
+
+                    Glide.with(this@BookDetailsActivity)
+                        .load(bookDoBanco.coverImage)
+                        .into(cover)
+                }
+            }
+        }
 
         requestButton.setOnClickListener {
             val inputInitialDate = convertToLocalDate(etInitialDate.text.toString())
@@ -136,11 +144,10 @@ class BookDetailsActivity : BaseActivity() {
                 }
                     return@launch
                 }
-                val urlImage : String? = intent.getStringExtra("URL_IMAGE")
                 val intent = Intent(this@BookDetailsActivity, RentRequestActivity::class.java)
                 intent.putExtra("TITLE", title.text)
                 intent.putExtra("AUTHOR", author.text)
-                intent.putExtra("URL_IMAGE", urlImage )
+                intent.putExtra("BOOK_ID", bookId)
                 startActivity(intent)
             }
 

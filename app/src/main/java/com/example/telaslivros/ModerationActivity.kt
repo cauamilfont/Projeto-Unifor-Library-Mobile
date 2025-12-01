@@ -4,9 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ModerationActivity : BaseActivity() {
     override fun getBottomNavItemId() = R.id.navigation_admin_moderacao;
@@ -26,14 +31,14 @@ class ModerationActivity : BaseActivity() {
         setupBottomNavigation()
 
         recyclerView = findViewById(R.id.recyclerViewComentarios)
-
-        val mockData = createMockData()
-
-        adapter = ModerationAdapter(mockData)
-
-
         recyclerView.layoutManager = LinearLayoutManager(this)
+        adapter = ModerationAdapter(mutableListOf()) { id, approved ->
+            handleModeration(id, approved)
+        }
+
+
         recyclerView.adapter = adapter
+        loadPendingReviews()
     }
 
     override fun onStart() {
@@ -41,32 +46,37 @@ class ModerationActivity : BaseActivity() {
 
 }
 
-    private fun createMockData(): MutableList<Comment> {
-        return mutableListOf(
-            Comment(
-                id = "1",
-                bookTitle = "O Guia do Mochileiro das Galáxias",
-                commentContent = "Este é um exemplo de comentário que precisa ser moderado. O livro é muito bom, mas a entrega demorou um pouco.",
-                ratingContent = 4.5f,
-                ratingPhysical = 4.0f,
-                authorName = "João Silva"
-            ),
-            Comment(
-                id = "2",
-                bookTitle = "Duna",
-                commentContent = "Odiei. A história é muito confusa e os personagens são chatos. Não recomendo para ninguém. Péssima experiência.",
-                ratingContent = 1.0f,
-                ratingPhysical = 3.0f,
-                authorName = "Maria Souza"
-            ),
-            Comment(
-                id = "3",
-                bookTitle = "A Culpa é das Estrelas",
-                commentContent = "Simplesmente perfeito! Chegou rápido e o livro é lindo. Chorei horrores. 10/10.",
-                ratingContent = 5.0f,
-                ratingPhysical = 5.0f,
-                authorName = "Ana Clara"
-            )
-        )
+    private fun loadPendingReviews() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val reviews = DatabaseHelper.getPendingReviews()
+
+
+            val uiList = reviews.map {
+                Comment(it.id,it.userId, 0,  it.bookTitle, it.commentContent, it.ratingContent, it.ratingPhysical, it.authorName)
+            }.toMutableList()
+
+            withContext(Dispatchers.Main) {
+                adapter.updateList(uiList)
+            }
+        }
+    }
+
+    private fun handleModeration(idString: String, approved: Boolean) {
+        val id = idString.toIntOrNull() ?: return
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val success = DatabaseHelper.moderateReview(id, approved)
+
+            withContext(Dispatchers.Main) {
+                if (success) {
+                    val msg = if (approved) "Avaliação Aprovada" else "Avaliação Rejeitada"
+                    Toast.makeText(this@ModerationActivity, msg, Toast.LENGTH_SHORT).show()
+                    // O adapter já removeu o item visualmente, mas é bom garantir sincronia
+                } else {
+                    Toast.makeText(this@ModerationActivity, "Erro ao processar.", Toast.LENGTH_SHORT).show()
+                    loadPendingReviews()
+                }
+            }
+        }
     }
     }

@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
 
-class ManageBooksAdapter (private val books: MutableList<Book>) :
+class ManageBooksAdapter (private var books: List<Book>) :
     RecyclerView.Adapter<ManageBooksAdapter.ManageBooksViewHolder>() {
 
     class ManageBooksViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -35,6 +35,11 @@ class ManageBooksAdapter (private val books: MutableList<Book>) :
 
     override fun getItemCount() = books.size
 
+    fun updateList(newList: List<Book>) {
+        books = newList
+        notifyDataSetChanged()
+    }
+
 
     override fun onBindViewHolder(holder: ManageBooksViewHolder, position: Int) {
         val book = books[position]
@@ -44,7 +49,7 @@ class ManageBooksAdapter (private val books: MutableList<Book>) :
         holder.stock.text = "Status: ${book.stock}"
 
         Glide.with(holder.itemView.context)
-            .load(book.imageURL)
+            .load(book.coverImage)
             .placeholder(R.drawable.ic_book_placeholder)
             .error(R.drawable.ic_book_error)
             .into(holder.cover)
@@ -55,7 +60,7 @@ class ManageBooksAdapter (private val books: MutableList<Book>) :
             val intent = Intent(context, EditBooksActivity::class.java)
 
 
-            intent.putExtra("BOOK_POSITION", holder.adapterPosition)
+            intent.putExtra("BOOK_ID", book.id)
 
             context.startActivity(intent)
         }

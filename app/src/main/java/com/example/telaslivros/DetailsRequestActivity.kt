@@ -3,8 +3,11 @@ package com.example.telaslivros
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
@@ -28,6 +31,8 @@ class DetailsRequestActivity : BaseActivity() {
     lateinit var initialDate : TextView
     lateinit var finalDate : TextView
     lateinit var cover : ImageView
+    lateinit var btnFinalizar: Button
+    lateinit var layoutBotoesAprovacao: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +47,8 @@ class DetailsRequestActivity : BaseActivity() {
         initialDate = findViewById(R.id.tvDataInicial)
         finalDate = findViewById(R.id.tvDataFinal)
         cover = findViewById(R.id.imgLivro)
+        btnFinalizar = findViewById(R.id.btnFinalizar)
+        layoutBotoesAprovacao = findViewById(R.id.layoutBotoesAprovacao)
 
 
         setupBottomNavigation()
@@ -50,64 +57,113 @@ class DetailsRequestActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
 
+        val bookId = intent.getIntExtra("BOOK_ID", 0)
+        val userIdString = intent.getStringExtra("USER_INFO")
+        val userId = userIdString?.toIntOrNull()
 
-        val imageURL = intent.getStringExtra("IMAGE_URL")
+        lifecycleScope.launch(Dispatchers.IO) {
+            val book = DatabaseHelper.getBookById(bookId)
+
+            val userRequest = DatabaseHelper.getUser(userId!!)
+
+            if(book != null && userRequest != null) {
+                withContext(Dispatchers.Main) {
+                    title.text = "Título: ${book.title}"
+                    author.text = "Autor: ${book.author}"
+                    user.text = "Nome: ${userRequest.nomeCompleto}"
+                    requestDate.text = intent.getStringExtra("R_DATE")
+                    initialDate.text = intent.getStringExtra("I_DATE")
+                    finalDate.text = intent.getStringExtra("F_DATE")
 
 
-        title.text = "Título: ${intent.getStringExtra("TITLE")}"
-        author.text = "Autor: ${intent.getStringExtra("AUTHOR")}"
-        user.text = "Nome: ${intent.getStringExtra("USER")}"
-        requestDate.text = intent.getStringExtra("R_DATE")
-        initialDate.text = intent.getStringExtra("I_DATE")
-        finalDate.text = intent.getStringExtra("F_DATE")
+                    Glide.with(this@DetailsRequestActivity)
+                        .load(book.coverImage)
+                        .placeholder(R.drawable.ic_book_placeholder)
+                        .error(R.drawable.ic_book_error)
+                        .into(cover)
+                }
+            }
 
 
-        Glide.with(this)
-            .load(imageURL)
-            .placeholder(R.drawable.ic_book_placeholder)
-            .error(R.drawable.ic_book_error)
-            .into(cover)
+        }
+
+
+
+
+
+        val statusString = intent.getStringExtra("RENT_STATUS")
+        val statusEnum = try { Status.valueOf(statusString ?: "PENDENTE") } catch (e: Exception) { Status.PENDENTE }
+        val rentId = intent.getStringExtra("EXTRA_TRANSACTION_ID")?.toIntOrNull() ?: 0
+
+
+        if (statusEnum == Status.APROVADO) {
+
+            layoutBotoesAprovacao.visibility = View.GONE
+            btnFinalizar.visibility = View.VISIBLE
+        } else if (statusEnum == Status.PENDENTE) {
+
+            layoutBotoesAprovacao.visibility = View.VISIBLE
+            btnFinalizar.visibility = View.GONE
+        } else {
+
+            layoutBotoesAprovacao.visibility = View.GONE
+            btnFinalizar.visibility = View.GONE
+        }
 
         btnAccept.setOnClickListener {
 
-            // 1. Recuperar o ID da solicitação que veio da tela anterior (Adapter)
-            // Ajuste a chave "EXTRA_TRANSACTION_ID" se você usou outro nome no Adapter
-            val rentIdString = intent.getStringExtra("EXTRA_TRANSACTION_ID")
-            val rentId = rentIdString?.toIntOrNull() ?: 0
 
-            // Validação de segurança
+            val requesterIdString = intent.getStringExtra("USER_INFO")
+
+            val requesterId = requesterIdString?.toIntOrNull() ?: 0
+
+
             if (rentId == 0) {
                 Toast.makeText(this, "Erro: ID da solicitação inválido", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // 2. Inicia a operação em SEGUNDO PLANO (IO)
+
             lifecycleScope.launch(Dispatchers.IO) {
 
-                // Chama a sua função no DatabaseHelper
-                // Ela vai atualizar o status para 'Aprovado' e gerar o código
+
                 val codigoGerado = DatabaseHelper.approveRent(rentId)
 
-                // 3. Volta para a Thread PRINCIPAL (Main) para mexer na tela
-                withContext(Dispatchers.Main) {
+
+
 
                     if (codigoGerado != null) {
-                        // --- SUCESSO ---
-                        Toast.makeText(
-                            applicationContext,
-                            "Solicitação Aprovada! Código: $codigoGerado",
-                            Toast.LENGTH_LONG
-                        ).show()
 
-                        // Navega de volta para a lista de solicitações
-                        val intent = Intent(this@DetailsRequestActivity, ManageRequestsActivity::class.java)
+                        val userConfig = DatabaseHelper.getNotificationConfig(requesterId)
+                        withContext(Dispatchers.Main) {
 
-                        // (Opcional) Essas flags limpam a tela de detalhes da memória,
-                        // para que o botão voltar não traga o usuário aqui de novo.
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                            Toast.makeText(
+                                applicationContext,
+                                "Solicitação Aprovada! Código: $codigoGerado",
+                                Toast.LENGTH_LONG
+                            ).show()
 
-                        startActivity(intent)
-                        finish() // Fecha a tela atual
+                            val deveNotificar = userConfig.notificaAluguel
+
+
+                            if (deveNotificar) {
+
+                                NotificationHelper.showNotification(
+                                    this@DetailsRequestActivity,
+                                    "Solicitação Aprovada",
+                                    "O usuário foi notificado que o livro está pronto para retirada."
+                                )
+
+                            } else {
+
+                                Log.d(
+                                    "NOTIFICACAO",
+                                    "Usuário optou por não receber notificações de aluguel."
+                                )
+                            }
+
+                            finish()
+                        }
 
                     } else {
                         // --- ERRO ---
@@ -119,7 +175,29 @@ class DetailsRequestActivity : BaseActivity() {
                     }
                 }
             }
+
+        btnFinalizar.setOnClickListener {
+            if (rentId == 0) return@setOnClickListener
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                val sucesso = DatabaseHelper.finalizeRent(rentId)
+
+                withContext(Dispatchers.Main) {
+                    if (sucesso) {
+                        Toast.makeText(applicationContext, "Livro devolvido com sucesso!", Toast.LENGTH_SHORT).show()
+
+                        // Volta para a lista
+                        val intent = Intent(this@DetailsRequestActivity, ManageRequestsActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        Toast.makeText(applicationContext, "Erro ao finalizar.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
+
 
         btnDecline.setOnClickListener {
             val rentIdString = intent.getStringExtra("EXTRA_TRANSACTION_ID")

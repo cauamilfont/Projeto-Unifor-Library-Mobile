@@ -2,13 +2,22 @@
 package com.example.telaslivros
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import android.net.Uri
+import java.io.ByteArrayOutputStream
 
 class EditBooksActivity : BaseActivity() {
     override fun getBottomNavItemId() = 0;
@@ -22,10 +31,23 @@ class EditBooksActivity : BaseActivity() {
     lateinit var synopsys : TextInputEditText
     lateinit var stock : TextInputEditText
     lateinit var cover : ImageView
+    private var bookId: Int = 0
 
 
-    private var bookPosition: Int = -1
+
     private lateinit var bookToEdit: Book
+    private var selectedImageBytes: ByteArray? = null
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if (uri != null) {
+
+            cover.setImageURI(uri)
+
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                selectedImageBytes = uriToByteArray(uri)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +67,10 @@ class EditBooksActivity : BaseActivity() {
 
         loadBookData()
 
+        cover.setOnClickListener {
+            pickImageLauncher.launch("image/*")
+            Toast.makeText(this, "Selecione uma nova capa", Toast.LENGTH_SHORT).show()
+        }
 
         btnSave.setOnClickListener {
             saveBookChanges()
@@ -57,33 +83,48 @@ class EditBooksActivity : BaseActivity() {
     }
 
     private fun loadBookData() {
-        // 4. Receber a POSIÇÃO enviada pelo Adapter
-        bookPosition = intent.getIntExtra("BOOK_POSITION", -1)
 
-        // Se a posição for inválida, feche a tela.
-        if (bookPosition == -1) {
+        bookId = intent.getIntExtra("BOOK_ID", 0)
+
+
+        if (bookId == 0) {
             Toast.makeText(this, "Erro ao carregar livro.", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
 
-        bookToEdit = BookRepository.bookList[bookPosition]
+        lifecycleScope.launch(Dispatchers.IO) {
+            val bookFromDb = DatabaseHelper.getBookById(bookId)
+
+            withContext(Dispatchers.Main) {
+                if (bookFromDb != null) {
+                    bookToEdit = bookFromDb
 
 
-        title.setText(bookToEdit.title)
-        author.setText(bookToEdit.author)
-        genre.setText(bookToEdit.genre)
-        synopsys.setText(bookToEdit.synopsis)
-        stock.setText(bookToEdit.stock.toString())
+                    title.setText(bookToEdit.title)
+                    author.setText(bookToEdit.author)
+                    genre.setText(bookToEdit.genre)
+                    synopsys.setText(bookToEdit.synopsis)
+                    stock.setText(bookToEdit.stock.toString())
 
-        Glide.with(this)
-            .load(bookToEdit.imageURL)
-            .placeholder(R.drawable.ic_book_placeholder)
-            .error(R.drawable.ic_book_error)
-            .into(cover)
+
+                    Glide.with(this@EditBooksActivity)
+                        .load(bookToEdit.coverImage)
+                        .placeholder(R.drawable.ic_book_placeholder)
+                        .error(R.drawable.ic_book_error)
+                        .into(cover)
+                } else {
+                    Toast.makeText(
+                        this@EditBooksActivity,
+                        "Livro não encontrado no banco.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    finish()
+                }
+            }
+        }
     }
-
     private fun saveBookChanges() {
 
         val newTitle = title.text.toString()
@@ -102,6 +143,7 @@ class EditBooksActivity : BaseActivity() {
             Toast.makeText(this, "Estoque inválido", Toast.LENGTH_SHORT).show()
             return
         }
+        val finalImage = selectedImageBytes ?: bookToEdit.coverImage
 
 
         val updatedBook = bookToEdit.copy(
@@ -109,16 +151,23 @@ class EditBooksActivity : BaseActivity() {
             author = newAuthor,
             genre = newGenre,
             synopsis = newSynopsis,
-            stock = newStock
+            stock = newStock,
+            coverImage = finalImage
         )
 
 
-        BookRepository.bookList[bookPosition] = updatedBook
+        lifecycleScope.launch(Dispatchers.IO) {
+            val success = DatabaseHelper.updateBook(updatedBook)
 
-        Toast.makeText(this, "Livro atualizado!", Toast.LENGTH_SHORT).show()
-
-
-        navigateToManageBooks()
+            withContext(Dispatchers.Main) {
+                if (success) {
+                    Toast.makeText(this@EditBooksActivity, "Livro atualizado com sucesso!", Toast.LENGTH_SHORT).show()
+                    navigateToManageBooks()
+                } else {
+                    Toast.makeText(this@EditBooksActivity, "Erro ao atualizar livro.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
 
@@ -136,18 +185,17 @@ class EditBooksActivity : BaseActivity() {
 
 
     private fun deleteBook() {
-        if (bookPosition == -1) {
-            Toast.makeText(this, "Erro: Livro não encontrado", Toast.LENGTH_SHORT).show()
-            return
+        lifecycleScope.launch(Dispatchers.IO) {
+            val success = DatabaseHelper.deleteBook(bookId)
+            withContext(Dispatchers.Main) {
+                if (success) {
+                    Toast.makeText(this@EditBooksActivity, "Livro excluído!", Toast.LENGTH_SHORT).show()
+                    navigateToManageBooks()
+                } else {
+                    Toast.makeText(this@EditBooksActivity, "Erro ao excluir.", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
-
-
-        BookRepository.bookList.removeAt(bookPosition)
-
-        Toast.makeText(this, "Livro excluído!", Toast.LENGTH_SHORT).show()
-
-
-        navigateToManageBooks()
     }
 
 
@@ -161,5 +209,23 @@ class EditBooksActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
 
+    }
+
+    private fun uriToByteArray(uri: Uri): ByteArray? {
+        return try {
+            val inputStream = contentResolver.openInputStream(uri)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+
+            // Redimensiona para evitar imagens gigantes no banco (opcional, mas recomendado)
+            val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 600, 800, true)
+
+            val stream = ByteArrayOutputStream()
+            // Comprime para JPEG (reduz tamanho do arquivo significativamente)
+            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream)
+            stream.toByteArray()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 }

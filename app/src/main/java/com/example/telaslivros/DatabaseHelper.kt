@@ -3,6 +3,8 @@ package com.example.telaslivros
 import android.os.StrictMode
 import java.sql.Connection
 import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.security.MessageDigest
 import java.sql.Date
 import java.sql.DriverManager
@@ -351,6 +353,7 @@ object DatabaseHelper {
                     b.sinopse,
                     b.quantidade_estoque,
                     b.genero,
+                    b.capa,
                     u.nome_completo
                 FROM solicitacoes_aluguel r
                 INNER JOIN livros b ON r.livro_id = b.id
@@ -375,6 +378,7 @@ object DatabaseHelper {
                     b.sinopse,
                     b.quantidade_estoque,
                     b.genero,
+                    b.capa,
                     u.nome_completo
                 FROM solicitacoes_aluguel r
                 INNER JOIN livros b ON r.livro_id = b.id
@@ -395,7 +399,7 @@ object DatabaseHelper {
                     id = resultSet.getInt("book_real_id"),
                     title = resultSet.getString("titulo"),
                     author = resultSet.getString("autor"),
-                    imageURL = "",
+                    coverImage = resultSet.getBytes("capa"),
 
                     synopsis = resultSet.getString("sinopse") ?: "",
                     bookQuality = 0.0F,
@@ -410,7 +414,6 @@ object DatabaseHelper {
                     userId = resultSet.getInt("user_id"),
                     bookId = resultSet.getInt("livro_id"),
                     status = Status.valueOf(resultSet.getString("status")),
-                    imageUrl = bookObj.imageURL,
 
 
                     requestDate = java.time.LocalDate.parse(
@@ -618,10 +621,10 @@ object DatabaseHelper {
 
     //FUNÇÔES PARA O CHATBOT
 
-    suspend fun getMyRentsForChat(userId: Int): String {
+    suspend fun getMyRentsForChat(userId: Int): String =  withContext(Dispatchers.IO) {
         val rents = getAllRents(userId)
 
-        if (rents.isEmpty()) return "Você não tem nenhum aluguel ou solicitação no momento."
+        if (rents.isEmpty()) return@withContext "Você não tem nenhum aluguel ou solicitação no momento."
 
 
         val sb = StringBuilder("Aqui estão seus aluguéis:\n")
@@ -640,26 +643,26 @@ object DatabaseHelper {
 
             sb.append("\n") // separador entre os itens
         }
-        return sb.toString()
+        return@withContext sb.toString()
     }
 
-    suspend fun getAvailableBooksForChat(): String {
+    suspend fun getAvailableBooksForChat(): String = withContext(Dispatchers.IO) {
         var connection: Connection? = null
-        return try {
+        try {
             connection = getConnection()
 
             val sql = """
-            SELECT titulo, autor, quantidade_estoque 
-            FROM livros 
-            WHERE quantidade_estoque > 0 
-            LIMIT 5
-        """.trimIndent()
+                SELECT titulo, autor, quantidade_estoque 
+                FROM livros 
+                WHERE quantidade_estoque > 0 
+                LIMIT 5
+            """.trimIndent()
 
             val stmt = connection?.prepareStatement(sql)
             val rs = stmt?.executeQuery()
 
             if (rs == null || !rs.next()) {
-                return "Não há livros disponíveis no momento."
+                return@withContext "Não há livros disponíveis no momento."
             }
 
             val sb = StringBuilder("📚 **Livros disponíveis no momento:**\n\n")
@@ -671,11 +674,11 @@ object DatabaseHelper {
 
                 sb.append(
                     """
-                • **$titulo**
-                   └ Autor: $autor
-                   └ Em estoque: $estoque unidades
-                
-                """.trimIndent()
+                    • **$titulo**
+                       └ Autor: $autor
+                       └ Em estoque: $estoque unidades
+                    
+                    """.trimIndent()
                 ).append("\n")
 
             } while (rs.next())
@@ -684,6 +687,54 @@ object DatabaseHelper {
 
         } catch (e: Exception) {
             "Erro ao buscar livros."
+        } finally {
+            connection?.close()
+        }
+    }
+
+    suspend fun getTopRatedBooksForChat(): String = withContext(Dispatchers.IO) {
+        var connection: Connection? = null
+        try {
+            connection = getConnection()
+            if (connection == null) return@withContext "Erro de conexão."
+
+            // Query: Calcula média das notas (conteúdo + física / 2) e ordena
+            val sql = """
+            SELECT 
+                l.titulo, 
+                l.autor,
+                COALESCE(AVG((a.qualidade_livro + a.qualidade_fisica) / 2.0), 0) as media_geral
+            FROM livros l
+            LEFT JOIN avaliacoes a ON l.id = a.livro_id AND a.status = 'APROVADO'
+            GROUP BY l.id
+            HAVING AVG((a.qualidade_livro + a.qualidade_fisica) / 2.0) > 0 -- Mostra apenas avaliados
+            ORDER BY media_geral DESC
+            LIMIT 5
+        """.trimIndent()
+
+            val stmt = connection.prepareStatement(sql)
+            val rs = stmt.executeQuery()
+
+            if (!rs.next()) {
+                return@withContext "Ainda não temos livros avaliados o suficiente para mostrar um ranking."
+            }
+
+            val sb = StringBuilder("⭐ **Top Livros Mais Bem Avaliados:**\n\n")
+
+            do {
+                val titulo = rs.getString("titulo")
+                val autor = rs.getString("autor")
+                val media = String.format("%.1f", rs.getDouble("media_geral")) // Formata ex: 4.5
+
+                sb.append("• **$titulo** ($media ⭐)\n   Autor: $autor\n\n")
+
+            } while (rs.next())
+
+            sb.toString()
+
+        } catch (e: Exception) {
+            Log.e("DB_CHAT", "Erro ranking: ${e.message}")
+            "Erro ao buscar o ranking de livros."
         } finally {
             connection?.close()
         }
@@ -802,6 +853,427 @@ object DatabaseHelper {
             connection?.close()
         }
     }
+
+    fun getAllBooks(): MutableList<Book> {
+        val bookList = mutableListOf<Book>()
+        var connection: Connection? = null
+        try {
+            connection = getConnection()
+            if (connection == null) return bookList
+
+
+            val sql = """
+                SELECT 
+                    l.id, l.titulo, l.autor, l.genero, l.sinopse, l.quantidade_estoque, l.capa,
+                    COALESCE(AVG(a.qualidade_livro), 0.0) as media_conteudo,
+                    COALESCE(AVG(a.qualidade_fisica), 0.0) as media_fisica
+                FROM livros l
+                LEFT JOIN avaliacoes a ON l.id = a.livro_id AND a.status = 'APROVADO'
+                GROUP BY l.id
+                ORDER BY l.id DESC
+            """
+
+            val statement = connection.createStatement()
+            val resultSet = statement.executeQuery(sql)
+
+            while (resultSet.next()) {
+                val book = Book(
+                    id = resultSet.getInt("id"),
+                    title = resultSet.getString("titulo"),
+                    author = resultSet.getString("autor"),
+
+                    coverImage =  resultSet.getBytes("capa"),
+                    synopsis = resultSet.getString("sinopse") ?: "",
+
+
+                    bookQuality = resultSet.getFloat("media_conteudo"),
+                    physicalQuality = resultSet.getFloat("media_fisica"),
+
+                    stock = resultSet.getInt("quantidade_estoque"),
+                    genre = resultSet.getString("genero")
+                )
+                bookList.add(book)
+            }
+        } catch (e: SQLException) {
+            Log.e("DB_ERROR", "Erro ao listar livros: ${e.message}")
+        } finally {
+            connection?.close()
+        }
+        return bookList
+    }
+
+    fun getBookById(id: Int): Book? {
+        var connection: Connection? = null
+        try {
+            connection = getConnection()
+            if (connection == null) return null
+
+            val sql = """
+                SELECT 
+                    l.id, l.titulo, l.autor, l.genero, l.sinopse, l.quantidade_estoque, l.capa,
+                    COALESCE(AVG(a.qualidade_livro), 0.0) as media_conteudo,
+                    COALESCE(AVG(a.qualidade_fisica), 0.0) as media_fisica
+                FROM livros l
+                LEFT JOIN avaliacoes a ON l.id = a.livro_id AND a.status = 'APROVADO'
+                WHERE l.id = ?
+                GROUP BY l.id
+            """
+
+            val statement = connection.prepareStatement(sql)
+            statement.setInt(1, id)
+
+            val resultSet = statement.executeQuery()
+
+            if (resultSet.next()) {
+                return Book(
+                    id = resultSet.getInt("id"),
+                    title = resultSet.getString("titulo"),
+                    author = resultSet.getString("autor"),
+                    coverImage =  resultSet.getBytes("capa"),
+
+                    synopsis = resultSet.getString("sinopse") ?: "",
+
+                    // PEGA AS MÉDIAS
+                    bookQuality = resultSet.getFloat("media_conteudo"),
+                    physicalQuality = resultSet.getFloat("media_fisica"),
+
+                    stock = resultSet.getInt("quantidade_estoque"),
+                    genre = resultSet.getString("genero")
+                )
+            }
+        } catch (e: SQLException) {
+            Log.e("DB_ERROR", "Erro ao buscar livro por ID: ${e.message}")
+        } finally {
+            connection?.close()
+        }
+        return null
+    }
+
+    fun updateBook(book: Book): Boolean {
+        var connection: Connection? = null
+        try {
+            connection = getConnection()
+            if (connection == null) return false
+
+            val sql = """
+                UPDATE livros 
+                SET titulo = ?, autor = ?, genero = ?, sinopse = ?, quantidade_estoque = ?, capa = ?
+                WHERE id = ?
+            """
+            val statement = connection.prepareStatement(sql)
+            statement.setString(1, book.title)
+            statement.setString(2, book.author)
+            statement.setString(3, book.genre)
+            statement.setString(4, book.synopsis)
+            statement.setInt(5, book.stock)
+            statement.setBytes(6, book.coverImage)
+            statement.setInt(7, book.id)
+
+            val rowsUpdated = statement.executeUpdate()
+            return rowsUpdated > 0
+
+        } catch (e: SQLException) {
+            Log.e("DB_ERROR", "Erro ao atualizar livro: ${e.message}")
+            return false
+        } finally {
+            connection?.close()
+        }
+    }
+
+    // 4. Excluir (DELETE)
+    fun deleteBook(id: Int): Boolean {
+        var connection: Connection? = null
+        try {
+            connection = getConnection()
+            if (connection == null) return false
+
+            val sql = "DELETE FROM livros WHERE id = ?"
+            val statement = connection.prepareStatement(sql)
+            statement.setInt(1, id)
+
+            val rowsDeleted = statement.executeUpdate()
+            return rowsDeleted > 0
+
+        } catch (e: SQLException) {
+            Log.e("DB_ERROR", "Erro ao excluir livro: ${e.message}")
+            return false
+        } finally {
+            connection?.close()
+        }
+    }
+
+    fun createBook(book: Book): Boolean {
+        var connection: Connection? = null
+        try {
+            connection = getConnection()
+            if (connection == null) return false
+
+            // A query SQL mapeando as colunas da sua tabela 'livros'
+            val sql = """
+                INSERT INTO livros 
+                (titulo, autor, genero, sinopse, quantidade_estoque, capa, criado_em, atualizado_em)
+                VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
+            """
+
+            val statement = connection.prepareStatement(sql)
+
+            // 1. Título
+            statement.setString(1, book.title)
+
+            // 2. Autor
+            statement.setString(2, book.author)
+
+            // 3. Gênero
+            statement.setString(3, book.genre)
+
+            // 4. Sinopse (Tratamento para nulo)
+            if (book.synopsis != null) {
+                statement.setString(4, book.synopsis)
+            } else {
+                statement.setNull(4, java.sql.Types.VARCHAR)
+            }
+
+            // 5. Quantidade em Estoque
+            statement.setInt(5, book.stock)
+
+            // 6. Capa (O segredo do BYTEA está aqui)
+            if (book.coverImage != null) {
+                // setBytes envia o ByteArray direto para a coluna BYTEA do Postgres
+                statement.setBytes(6, book.coverImage)
+            } else {
+                // Se não tem imagem, manda NULL do tipo BINARY
+                statement.setNull(6, java.sql.Types.BINARY)
+            }
+
+            val rowsInserted = statement.executeUpdate()
+
+            // Se inseriu pelo menos 1 linha, retorna verdadeiro
+            return rowsInserted > 0
+
+        } catch (e: SQLException) {
+            Log.e("DB_ERROR", "Erro ao adicionar livro: ${e.message}")
+            e.printStackTrace()
+            return false
+        } finally {
+            connection?.close()
+        }
+    }
+
+
+    fun adicionarAvaliacao(avaliacao: Comment): Boolean {
+        var connection: Connection? = null
+        try {
+            connection = getConnection()
+            if (connection == null) return false
+
+
+            val sql = """
+                INSERT INTO avaliacoes 
+                (user_id, livro_id, qualidade_livro, qualidade_fisica, comentario, criado_em, status)
+                VALUES (?, ?, ?, ?, ?, NOW(), 'PENDENTE')
+            """
+
+            val statement = connection.prepareStatement(sql)
+
+
+            statement.setInt(1, avaliacao.userId)
+
+
+            statement.setInt(2, avaliacao.bookId!!)
+
+
+            statement.setInt(3, avaliacao.ratingContent)
+
+
+            statement.setInt(4, avaliacao.ratingPhysical)
+
+
+            statement.setString(5, avaliacao.commentContent)
+
+
+            val rowsInserted = statement.executeUpdate()
+
+
+            return rowsInserted > 0
+
+        } catch (e: SQLException) {
+            Log.e("DB_ERROR", "Erro ao salvar avaliação: ${e.message}")
+            e.printStackTrace()
+            return false
+        } finally {
+            connection?.close()
+        }
+    }
+
+    fun getPendingReviews(): List<PendentReview> {
+        val lista = mutableListOf<PendentReview>()
+        var connection: Connection? = null
+
+        try {
+            connection = getConnection()
+            if (connection == null) return lista
+
+            val sql = """
+                SELECT 
+                    a.id, 
+                    a.comentario, 
+                    a.qualidade_livro, 
+                    a.qualidade_fisica,
+                    l.titulo AS nome_livro, 
+                    u.nome_completo AS nome_usuario,
+                    u.id AS id_usuario
+                FROM avaliacoes a
+                INNER JOIN livros l ON a.livro_id = l.id
+                INNER JOIN users u ON a.user_id = u.id
+                WHERE a.status = 'PENDENTE'
+                ORDER BY a.criado_em ASC
+            """
+
+            val statement = connection.createStatement()
+            val resultSet = statement.executeQuery(sql)
+
+            while (resultSet.next()) {
+                val item = PendentReview(
+                    id = resultSet.getInt("id"),
+                    userId = resultSet.getInt("id_usuario"),
+                    bookTitle = resultSet.getString("nome_livro"),
+                    authorName = resultSet.getString("nome_usuario"),
+                    commentContent = resultSet.getString("comentario") ?: "",
+                    ratingContent = resultSet.getInt("qualidade_livro"),
+                    ratingPhysical = resultSet.getInt("qualidade_fisica")
+                )
+                lista.add(item)
+            }
+
+        } catch (e: SQLException) {
+            Log.e("DB_ERROR", "Erro ao buscar avaliações pendentes: ${e.message}")
+        } finally {
+            connection?.close()
+        }
+
+        return lista
+    }
+
+    /**
+     * Atualiza o status da avaliação.
+     * @param reviewId O ID da avaliação
+     * @param approved Se true -> 'APROVADO', Se false -> 'REJEITADO'
+     */
+    fun moderateReview(reviewId: Int, approved: Boolean): Boolean {
+        var connection: Connection? = null
+        try {
+            connection = getConnection()
+            if (connection == null) return false
+
+            val newStatus = if (approved) "APROVADO" else "REJEITADO"
+
+            val sql = "UPDATE avaliacoes SET status = ? WHERE id = ?"
+
+            val statement = connection.prepareStatement(sql)
+            statement.setString(1, newStatus)
+            statement.setInt(2, reviewId)
+
+            val rowsUpdated = statement.executeUpdate()
+            return rowsUpdated > 0
+
+        } catch (e: SQLException) {
+            Log.e("DB_ERROR", "Erro ao moderar avaliação: ${e.message}")
+            return false
+        } finally {
+            connection?.close()
+        }
+    }
+
+    fun getAvaliacao(userId: Int, livroId: Int): Comment? {
+        var connection: Connection? = null
+        try {
+            connection = getConnection()
+            if (connection == null) return null
+
+            val sql = "SELECT * FROM avaliacoes WHERE user_id = ? AND livro_id = ?"
+            val statement = connection.prepareStatement(sql)
+            statement.setInt(1, userId)
+            statement.setInt(2, livroId)
+
+            val resultSet = statement.executeQuery()
+
+            if (resultSet.next()) {
+                return Comment(
+                    id = resultSet.getInt("id"),
+                    bookTitle = "",
+                    authorName = "",
+                    userId = userId,
+                    bookId = livroId,
+                    ratingContent = resultSet.getInt("qualidade_livro"),
+                    ratingPhysical = resultSet.getInt("qualidade_fisica"),
+                    commentContent = resultSet.getString("comentario")
+                )
+            }
+            return null
+
+        } catch (e: SQLException) {
+            Log.e("DB_ERROR", "Erro ao buscar avaliação: ${e.message}")
+            return null
+        } finally {
+            connection?.close()
+        }
+    }
+
+    fun finalizeRent(rentId: Int): Boolean {
+        var connection: Connection? = null
+        try {
+            connection = getConnection()
+            if (connection == null) return false
+
+            val sql = "UPDATE solicitacoes_aluguel SET status = 'DEVOLVIDO' WHERE id = ?"
+
+            val statement = connection.prepareStatement(sql)
+            statement.setInt(1, rentId)
+
+            val rowsUpdated = statement.executeUpdate()
+            return rowsUpdated > 0
+
+        } catch (e: SQLException) {
+            Log.e("DB_ERROR", "Erro ao finalizar aluguel: ${e.message}")
+            return false
+        } finally {
+            connection?.close()
+        }
+    }
+
+    fun getDashboardStats(): DashboardStats {
+        var connection: Connection? = null
+        var pending = 0
+        var rented = 0
+        var total = 0
+
+        try {
+            connection = getConnection()
+            if (connection == null) return DashboardStats(0, 0, 0)
+
+            val statement = connection.createStatement()
+
+
+            var rs = statement.executeQuery("SELECT COUNT(*) FROM solicitacoes_aluguel WHERE status = 'PENDENTE'")
+            if (rs.next()) pending = rs.getInt(1)
+
+            rs = statement.executeQuery("SELECT COUNT(*) FROM solicitacoes_aluguel WHERE status = 'APROVADO'")
+            if (rs.next()) rented = rs.getInt(1)
+
+
+            rs = statement.executeQuery("SELECT COUNT(*) FROM livros")
+            if (rs.next()) total = rs.getInt(1)
+
+            return DashboardStats(pending, rented, total)
+
+        } catch (e: SQLException) {
+            Log.e("DB_ERROR", "Erro ao buscar estatísticas: ${e.message}")
+            return DashboardStats(0, 0, 0)
+        } finally {
+            connection?.close()
+        }
+    }
+
 
     fun formatDate(date: LocalDate?): String {
         val localeBR = Locale.forLanguageTag("pt-BR")

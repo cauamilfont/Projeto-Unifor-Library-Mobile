@@ -5,7 +5,11 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RentRequestActivity : BaseActivity() {
     override fun getBottomNavItemId() = 0;
@@ -29,15 +33,29 @@ class RentRequestActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
+        val bookId = intent.getIntExtra("BOOK_ID", 0)
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val book = DatabaseHelper.getBookById(bookId)
+            if(book != null){
+                withContext(Dispatchers.Main) {
+                    Glide.with(this@RentRequestActivity)
+                        .load(book.coverImage)
+                        .placeholder(R.drawable.ic_book_placeholder)
+                        .error(R.drawable.ic_book_error)
+                        .into(cover)
+                }
+
+            }
+
+
+
+        }
 
         title.text = "Título : ${intent.getStringExtra("TITLE")}"
         author.text = "Autor : ${intent.getStringExtra("AUTHOR")}"
 
-        Glide.with(this)
-            .load(intent.getStringExtra("URL_IMAGE"))
-            .placeholder(R.drawable.ic_book_placeholder)
-            .error(R.drawable.ic_book_error)
-            .into(cover)
+
 
         oktButton.setOnClickListener {
             val intent = Intent(this, ExploreBooksActivity::class.java)

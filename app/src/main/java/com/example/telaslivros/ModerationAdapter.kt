@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 
-class ModerationAdapter(private val commentList: MutableList<Comment>) :
+class ModerationAdapter(private var commentList: MutableList<Comment>, private val onModerationAction: (String, Boolean) -> Unit) :
     RecyclerView.Adapter<ModerationAdapter.CommentViewHolder>() {
 
     class CommentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -34,26 +34,37 @@ class ModerationAdapter(private val commentList: MutableList<Comment>) :
 
     override fun onBindViewHolder(holder: CommentViewHolder, position: Int) {
 
-        val comments = commentList[position]
+        val comment = commentList[position]
 
 
-        holder.bookTitle.text = "Livro: ${comments.bookTitle}"
-        holder.commentContent.text = comments.commentContent
-        holder.authorName.text = "Por: ${comments.authorName}"
-        holder.ratingContent.rating = comments.ratingContent
-        holder.ratingPhysical.rating = comments.ratingPhysical
+        holder.bookTitle.text = "Livro: ${comment.bookTitle}"
+        holder.commentContent.text = comment.commentContent
+        holder.authorName.text = "Por: ${comment.authorName}"
+        holder.ratingContent.rating = comment.ratingContent.toFloat()
+        holder.ratingPhysical.rating = comment.ratingPhysical.toFloat()
 
 
-        val removeClickListener = View.OnClickListener {
-            val currentPosition = holder.bindingAdapterPosition
-            if (currentPosition != RecyclerView.NO_POSITION) {
-                commentList.removeAt(currentPosition)
-                notifyItemRemoved(currentPosition)
-                notifyItemRangeChanged(currentPosition, commentList.size)
-            }
+        holder.approveButton.setOnClickListener {
+            onModerationAction(comment.id.toString(), true)
+            removeItem(position)
         }
 
-        holder.approveButton.setOnClickListener(removeClickListener)
-        holder.rejectButton.setOnClickListener(removeClickListener)
+        holder.rejectButton.setOnClickListener {
+            onModerationAction(comment.id.toString(), false)
+            removeItem(position)
+        }
+    }
+
+    private fun removeItem(position: Int) {
+        if (position in commentList.indices) {
+            commentList.removeAt(position)
+            notifyItemRemoved(position)
+            notifyItemRangeChanged(position, commentList.size)
+        }
+    }
+
+    fun updateList(newList: MutableList<Comment>) {
+        commentList = newList
+        notifyDataSetChanged()
     }
 }

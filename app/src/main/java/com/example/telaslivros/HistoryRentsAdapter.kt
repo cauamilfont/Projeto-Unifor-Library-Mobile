@@ -45,7 +45,7 @@ class HistoryRentsAdapter(private val historyList: List<Rent>) :
 
         // Imagem (está no objeto book)
         Glide.with(holder.itemView.context)
-            .load(rent.book?.imageURL)
+            .load(rent.book?.coverImage)
             .placeholder(R.drawable.ic_book_placeholder)
             .error(R.drawable.ic_book_error)
             .into(holder.cover)
@@ -58,7 +58,7 @@ class HistoryRentsAdapter(private val historyList: List<Rent>) :
             // Passar dados do livro para a tela de avaliação
             intent.putExtra("BOOK_TITLE", rent.book?.title)
             intent.putExtra("BOOK_ID", rent.book?.id)
-            intent.putExtra("BOOK_IMAGE", rent.book?.imageURL)
+
 
             context.startActivity(intent)
         }

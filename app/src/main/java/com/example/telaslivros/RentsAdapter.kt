@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import java.time.format.DateTimeFormatter
 
 class RentsAdapter(private val rents: List<Rent>) :
     RecyclerView.Adapter<RentsAdapter.RentViewHolder>() {
@@ -17,6 +18,8 @@ class RentsAdapter(private val rents: List<Rent>) :
         val author: TextView = view.findViewById(R.id.tvBookAuthor)
         val status: TextView = view.findViewById(R.id.tvStatus)
         val cover: ImageView = view.findViewById(R.id.ivBookCover)
+        val tvInitialDate: TextView = view.findViewById(R.id.tvInitialDate)
+        val tvFinalDate: TextView = view.findViewById(R.id.tvFinalDate)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RentViewHolder {
@@ -31,15 +34,18 @@ class RentsAdapter(private val rents: List<Rent>) :
         val rent = rents[position]
 
 
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         holder.title.text = "Título: ${rent.book?.title}"
         holder.author.text = "Autor: ${rent.book?.author}"
+        holder.tvInitialDate.text = "Retirada: ${rent.initialDate?.format(formatter) ?: "-"}"
+        holder.tvFinalDate.text = "Devolução: ${rent.finalDate?.format(formatter) ?: "-"}"
 
 
         holder.status.text = "Status:\n${rent.status}"
 
 
         Glide.with(holder.itemView.context)
-            .load(rent.book?.imageURL)
+            .load(rent.book?.coverImage)
             .placeholder(R.drawable.ic_book_placeholder)
             .error(R.drawable.ic_book_error)
             .into(holder.cover)

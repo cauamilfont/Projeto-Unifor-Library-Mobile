@@ -35,7 +35,7 @@ class ChatBotActivity : BaseActivity() {
 
     private lateinit var rvMessages: RecyclerView
     lateinit var userMessage : EditText
-    private val geminiApiKey = "AIzaSyDtLjlUnEWudCOlKSYEkXAE8TGa8F8pAr0"
+    private val geminiApiKey = "AIzaSyDq3a457wvWxkm5WO_fncNSrMV1fFo2QB8"
     private lateinit var chat : Chat
     private lateinit var chatAdapter: ChatAdapter
     private val messageList = mutableListOf<Message>()
@@ -107,6 +107,24 @@ class ChatBotActivity : BaseActivity() {
             requiredParameters = emptyList()
         )
 
+        val topRatedBooksFunction = FunctionDeclaration(
+            name = "buscarLivrosMelhorAvaliados",
+            description = "Retorna uma lista dos livros com as melhores notas e avaliações dos usuários.",
+            parameters = listOf(
+                Schema(
+                    name = "parameters",
+                    description = "Sem parâmetros",
+                    type = FunctionType.OBJECT,
+                    properties = emptyMap(),
+                    required = emptyList(),
+                    format = null, nullable = false, enum = null, items = null
+                )
+            ),
+            requiredParameters = emptyList()
+        )
+
+        val topRatedTool = Tool(listOf(topRatedBooksFunction))
+
         val myRentsTool = Tool(
             functionDeclarations = listOf(myRentsFunction)
         )
@@ -118,7 +136,7 @@ class ChatBotActivity : BaseActivity() {
         val generativeModel = GenerativeModel(
             modelName = "gemini-2.5-flash",
             apiKey = geminiApiKey,
-            tools = listOf(myRentsTool, booksTool)
+            tools = listOf(myRentsTool, booksTool, topRatedTool)
         )
 
         chat = generativeModel.startChat(history = emptyList())
@@ -181,6 +199,7 @@ class ChatBotActivity : BaseActivity() {
                     val toolResult = when (functionName) {
                         "buscarMeusAlugueis" -> DatabaseHelper.getMyRentsForChat(currentUserId)
                         "buscarLivrosDisponiveis" -> DatabaseHelper.getAvailableBooksForChat()
+                        "buscarLivrosMelhorAvaliados" -> DatabaseHelper.getTopRatedBooksForChat()
                         else -> "Função desconhecida."
                     }
 
@@ -225,10 +244,11 @@ class ChatBotActivity : BaseActivity() {
 
     private fun prePrompt(): String {
         return """
-            Você é um assistente da biblioteca. O nome do usuário é $userName.
+            Você é um assistente de um aplicativo de biblioteca, onde é possivel fazer reservas online, logo só responda sobre assuntos relacionados. O nome do usuário é $userName.
             VOCÊ TEM ACESSO A FERRAMENTAS REAIS para buscar dados.
             Se o usuário perguntar sobre 'aluguéis', 'reservas' ou 'status', USE A FERRAMENTA 'buscarMeusAlugueis'.
-            Se perguntar sobre livros disponíveis, USE A FERRAMENTA 'buscarLivrosDisponiveis',responda de maneira organizada, clara e formatada
+            Se perguntar sobre livros disponíveis, USE A FERRAMENTA 'buscarLivrosDisponiveis',responda de maneira organizada, clara e formatada.
+            Se perguntar sobre 'livros bem avaliados', 'melhores livros' ou 'ranking', USE A FERRAMENTA 'buscarLivrosMelhorAvaliados',responda de maneira organizada, clara e formatada.
             Não invente dados. Use as funções.
             Responda em português.
             Quando for usar as ferramentas para buscar os dados, formate os dados, para informar o usuario de forma limpa e organizada
