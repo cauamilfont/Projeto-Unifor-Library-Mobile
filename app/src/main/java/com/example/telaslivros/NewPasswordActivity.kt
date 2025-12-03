@@ -2,6 +2,7 @@ package com.example.telaslivros
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -32,12 +33,13 @@ class NewPasswordActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         btnConfirm.setOnClickListener {
-            val userId = intent.getIntExtra("USER_ID", 0)
-            if (userId == 0) {
-                Toast.makeText(this, "Erro fatal. E-mail não encontrado.", Toast.LENGTH_SHORT)
-                    .show()
-                finish()
-            }
+
+            val email = intent.getStringExtra("EMAIL_RECUPERACAO")
+            val code = intent.getStringExtra("CODIGO_VALIDADO")
+
+
+            Log.e("USER_EMAIL", email.toString())
+
             val newPasswordText = newPassword.text.toString()
             val confirmPasswordText = confirmPassword.text.toString()
             if (newPasswordText != confirmPasswordText) {
@@ -46,30 +48,28 @@ class NewPasswordActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             lifecycleScope.launch(Dispatchers.IO) {
-                val userDatabase =
-                    DatabaseHelper.changePassword(newPasswordText, userId)
+
+                val sucesso = DatabaseHelper.updatePasswordWithCode(email!!, code!!, newPasswordText)
+
 
                 withContext(Dispatchers.Main) {
-                    if (userDatabase) {
+                    if (sucesso) {
                         Toast.makeText(
                             applicationContext,
                             "Senha alterada com sucesso!",
                             Toast.LENGTH_SHORT
                         ).show()
-                        val intent = Intent(this@NewPasswordActivity, LoginActivity::class.java)
-                        intent.flags =
-                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(intent)
-                        finish()
+                        startActivity(Intent(this@NewPasswordActivity, LoginActivity::class.java))
+                        finishAffinity()
+                    } else {
+                        Toast.makeText(
+                            applicationContext,
+                            "Erro ao alterar senha.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-                    Toast.makeText(
-                        applicationContext,
-                        "Erro ao Alterar Senha!",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
             }
-
         }
 
     }

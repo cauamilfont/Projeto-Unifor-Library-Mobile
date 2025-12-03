@@ -5,13 +5,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var login: Button
     lateinit var register: Button
+    lateinit var image : ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,6 +22,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         login = findViewById(R.id.btnEntrar)
         register = findViewById(R.id.btnCriarConta)
+        image = findViewById(R.id.imgLogo)
 
         NotificationHelper.createChannel(this)
 
@@ -30,6 +34,13 @@ class MainActivity : AppCompatActivity() {
 
         val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         val token = prefs.getString("AUTH_TOKEN", null)
+
+        Glide.with(this)
+            .load(R.drawable.logo)
+            .placeholder(R.drawable.ic_book_placeholder)
+            .error(R.drawable.ic_book_error)
+            .into(image)
+
 
         Log.e("TOKEN_3", token.toString())
 

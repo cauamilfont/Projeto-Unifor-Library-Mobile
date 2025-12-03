@@ -62,7 +62,7 @@ object DatabaseHelper {
                 "SELECT id, nome_completo, email, tipo_usuario FROM users WHERE email = ? AND senha_hash = ?"
 
             val statement = connection.prepareStatement(sql)
-            statement.setString(1, email)
+            statement.setString(1, email.lowercase(Locale.ROOT))
             statement.setString(2, hashedPassword)
 
             val resultSet = statement.executeQuery()
@@ -106,7 +106,7 @@ object DatabaseHelper {
 
             val statement = connection.prepareStatement(sql)
             statement.setString(1, nome)
-            statement.setString(2, email)
+            statement.setString(2, email.lowercase(Locale.ROOT))
             statement.setString(3, cpf)
             statement.setString(4, hashedPassword)
 
@@ -129,7 +129,7 @@ object DatabaseHelper {
 
             val sql = "SELECT id FROM users WHERE email = ?"
             val statement = connection.prepareStatement(sql)
-            statement.setString(1, email)
+            statement.setString(1, email.lowercase(Locale.ROOT))
 
             val resultSet = statement.executeQuery()
 
@@ -189,7 +189,7 @@ object DatabaseHelper {
             statement.setString(2, user.telefone)
             statement.setString(3, user.cep)
             statement.setBytes(4, user.fotoPerfil)
-            statement.setString(5, user.email)
+            statement.setString(5, user.email.lowercase(Locale.ROOT))
 
             val rowsAffected = statement.executeUpdate()
 
@@ -218,6 +218,33 @@ object DatabaseHelper {
             val resultSet = statement.executeQuery()
             if (resultSet.next()) {
                 return mapResultSetToUser(resultSet)
+            }
+
+
+        } catch (e: SQLException) {
+            Log.e("DB_ERROR", "Erro ao carregar usuário: ${e.message}")
+            return null
+        } finally {
+            connection?.close()
+        }
+        return null
+    }
+
+    fun getUserIdByEmail(email: String): Int? {
+
+        var connection: Connection? = null
+        try {
+            connection = getConnection()
+            if (connection == null)
+                return null
+
+            val sql = "SELECT id FROM users WHERE email = ?"
+            val statement = connection.prepareStatement(sql)
+            statement.setString(1, email.lowercase(Locale.ROOT))
+
+            val resultSet = statement.executeQuery()
+            if (resultSet.next()) {
+                return resultSet.getInt("id")
             }
 
 
@@ -619,7 +646,7 @@ object DatabaseHelper {
     }
 
 
-    //FUNÇÔES PARA O CHATBOT
+
 
     suspend fun getMyRentsForChat(userId: Int): String =  withContext(Dispatchers.IO) {
         val rents = getAllRents(userId)
@@ -1269,6 +1296,142 @@ object DatabaseHelper {
         } catch (e: SQLException) {
             Log.e("DB_ERROR", "Erro ao buscar estatísticas: ${e.message}")
             return DashboardStats(0, 0, 0)
+        } finally {
+            connection?.close()
+        }
+    }
+
+
+    fun requestPasswordReset(email: String): String? {
+        var connection: Connection? = null
+        try {
+            connection = getConnection()
+            if (connection == null) return null
+
+            // A. Pega o ID do usuário
+            val userId = getUserIdByEmail(email)
+            if (userId == null)
+                return null
+
+
+            val invalidateSql = "UPDATE password_reset_codes SET utilizado = TRUE WHERE user_id = ? AND utilizado = FALSE"
+            val invalidateStmt = connection.prepareStatement(invalidateSql)
+            invalidateStmt.setInt(1, userId)
+            invalidateStmt.executeUpdate()
+            // ------------------------------------------------
+
+
+            val code = (100000..999999).random().toString()
+
+
+            val ldt = java.time.LocalDateTime.now().plusMinutes(5)
+            val millis = ldt.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+            val expiracao = java.sql.Timestamp(millis)
+
+
+            val sql = """
+                INSERT INTO password_reset_codes (user_id, codigo, expiracao, utilizado) 
+                VALUES (?, ?, ?, FALSE)
+            """
+            val stmt = connection.prepareStatement(sql)
+            stmt.setInt(1, userId)
+            stmt.setString(2, code)
+            stmt.setTimestamp(3, expiracao)
+
+            stmt.executeUpdate()
+
+            return code
+
+        } catch (e: SQLException) {
+            Log.e("DB_ERROR", "Erro ao gerar token: ${e.message}")
+            return null
+        } finally {
+            connection?.close()
+        }
+    }
+
+
+    fun validateRecoveryCode(email: String, code: String): Boolean {
+        var connection: Connection? = null
+        try {
+            connection = getConnection()
+            if (connection == null) return false
+
+            val userId = getUserIdByEmail(email)
+            if(userId == null)
+                return false
+
+            val sql = """
+                SELECT id FROM password_reset_codes 
+                WHERE user_id = ? 
+                AND codigo = ? 
+                AND utilizado = FALSE 
+                AND expiracao > NOW()
+            """
+
+            val stmt = connection.prepareStatement(sql)
+            stmt.setInt(1, userId)
+            stmt.setString(2, code)
+
+            val rs = stmt.executeQuery()
+
+            return rs.next() // Se retornou linha, é válido
+
+        } catch (e: SQLException) {
+            Log.e("DB_ERROR", "Erro ao validar código: ${e.message}")
+            return false
+        } finally {
+            connection?.close()
+        }
+    }
+
+
+    fun updatePasswordWithCode(email: String, code: String, newPassword: String): Boolean {
+        var connection: Connection? = null
+        try {
+            connection = getConnection()
+            if (connection == null) return false
+
+
+            connection.autoCommit = false
+
+            val userId = getUserIdByEmail(email)
+            if(userId == null)
+                return false
+
+            val checkSql = "SELECT id FROM password_reset_codes WHERE user_id = ? AND codigo = ? AND utilizado = FALSE AND expiracao > NOW()"
+            val checkStmt = connection.prepareStatement(checkSql)
+            checkStmt.setInt(1, userId)
+            checkStmt.setString(2, code)
+
+            if (!checkStmt.executeQuery().next()) {
+                connection.close()
+                return false
+            }
+
+
+            val hashedPassword = hashString(newPassword)
+            val updateUserSql = "UPDATE users SET senha_hash = ? WHERE id = ?"
+            val updateUserStmt = connection.prepareStatement(updateUserSql)
+            updateUserStmt.setString(1, hashedPassword)
+            updateUserStmt.setInt(2, userId)
+            updateUserStmt.executeUpdate()
+
+
+            val updateCodeSql = "UPDATE password_reset_codes SET utilizado = TRUE WHERE user_id = ? AND codigo = ?"
+            val updateCodeStmt = connection.prepareStatement(updateCodeSql)
+            updateCodeStmt.setInt(1, userId)
+            updateCodeStmt.setString(2, code)
+            updateCodeStmt.executeUpdate()
+
+
+            connection.commit()
+            return true
+
+        } catch (e: SQLException) {
+            try { connection?.rollback() } catch (_: Exception) {} // Desfaz se der erro
+            Log.e("DB_ERROR", "Erro ao redefinir senha: ${e.message}")
+            return false
         } finally {
             connection?.close()
         }
